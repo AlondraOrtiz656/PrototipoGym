@@ -1,0 +1,50 @@
+public static void main(String[] args) {
+    
+        JFrame frame = new JFrame("Menú de Mantenimientos");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+       
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        placeComponents(panel);
+     
+        frame.setVisible(true);
+    }
+
+    private static void placeComponents(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel titleLabel = new JLabel("Seleccione una opción:");
+        titleLabel.setBounds(10, 20, 200, 25);
+        panel.add(titleLabel);
+
+
+        String[] opciones = {
+            "1. Mantenimientos",
+            "a) De Usuarios",
+            "b) De Entrenador",
+            "c) De Localización",
+            "d) De Salas",
+            "e) De Actividades",
+            "f) De Horarios Actividades",
+            "g) Clientes",
+            "h) Estado Reservas",
+            "i) De Reservas",
+            "j) Reversa Actividades"
+        };
+
+        int yPosition = 50; 
+        for (String opcion : opciones) {
+            JButton button = new JButton(opcion);
+            button.setBounds(10, yPosition, 350, 25);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(panel, "Has seleccionado: " + opcion);
+                }
+            });
+            panel.add(button);
+            yPosition += 30;
+        }
+    }
+}
