@@ -5,19 +5,25 @@ import javax.swing.JOptionPane;
 public class Seguridad {
     private final Login login;
 
-    public Seguridad() {
-        this.login = new Login();
+    public Seguridad(Login login) {
+        this.login = login; // Usa la instancia real de Login
     }
 
     public void validarUsuario(String[] usuarios, String user, String pwd, int intentos) {
         boolean encontrado = false;
 
-        for (int i = 0; i < usuarios.length - 1; i++) {
+        for (int i = 0; i < usuarios.length; i++) {
             String[] credenciales = usuarios[i].split(",");
-            if (credenciales.length == 2 && credenciales[0].equalsIgnoreCase(user) && credenciales[1].equals(pwd)) {
+            if (credenciales.length == 2 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
                 JOptionPane.showMessageDialog(null, "Bienvenido " + user, "Inicio de sesión", JOptionPane.INFORMATION_MESSAGE);
                 encontrado = true;
-                login.setIntentos(0);
+                login.setIntentos(0); 
+                
+                // Abre el nuevo menú y cierra el Login actual
+                Menu m = new Menu();
+                m.setVisible(true);
+                login.dispose(); // Cierra la ventana correcta
+                
                 return;
             }
         }
@@ -30,4 +36,5 @@ public class Seguridad {
         }
     }
 }
+
 

@@ -4,8 +4,10 @@
  */
 package com.mycompany.prototipogym;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -15,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author User
  */
 public class MUsuario extends javax.swing.JFrame {
-    private static final String FILE_PATH = "E:/MUsuario.txt";
+    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\usuarios.txt";
 
     /**
      * Creates new form MUsuario
@@ -24,18 +26,90 @@ public class MUsuario extends javax.swing.JFrame {
         initComponents();
         setTitle("Mantenimiento de Usuario");
         setLocationRelativeTo(null);
-        verificarEstadoArchivo();
 
     }
     
-    private void verificarEstadoArchivo() {
-        File archivo = new File(FILE_PATH);
-        if (archivo.exists()) {
-            txtMUAccion.setText("Modificando");
-        } else {
-            txtMUAccion.setText("Creando");
-        }
+    private void verificarEstadoArchivo(String usuario, String contraseña) {
+    File archivo = new File(FILE_PATH);
+    
+    if (!archivo.exists()) {
+        txtMUAccion.setText("Creando"); // Si el archivo no existe, se está creando
+        return;
     }
+
+    boolean usuarioEncontrado = false;
+
+    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 2 && datos[0].equals(usuario) && datos[1].equals(contraseña)) {
+                usuarioEncontrado = true;
+                break;
+            }
+        }
+    } catch (IOException e) {
+        txtMUAccion.setText("Error al leer el archivo");
+        return;
+    }
+
+    if (usuarioEncontrado) {
+        txtMUAccion.setText("Modificando");
+    } else {
+        txtMUAccion.setText("Creando");
+    }
+}
+
+    private void cargarUsuario() {
+    String usuario = txtMUusuario.getText().trim();
+    if(usuario.isEmpty()){
+        return;
+    }
+    File archivo = new File(FILE_PATH);
+    if(!archivo.exists()){
+        txtMUAccion.setText("Creando");
+        return;
+    }
+    boolean usuarioEncontrado = false;
+    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            // Se asume que el registro tiene 6 elementos:
+            // [0] usuario, [1] contraseña, [2] nivel, [3] nombre, [4] apellido, [5] correo
+            if(datos.length >= 6 && datos[0].equals(usuario)) {
+                usuarioEncontrado = true;
+                // Se llenan los campos con la información obtenida:
+                txtMUpwd.setText(datos[1]);
+                // Ajusta el índice del combo según la información del archivo:
+                // En este ejemplo, si el valor en el archivo es "1" se asocia a "1 Normal" (índice 0),
+                // y si es "0" se asocia a "0 Administrador" (índice 1)
+                if(datos[2].equals("1")){
+                    cmbMUnivel.setSelectedIndex(0);
+                } else if(datos[2].equals("0")){
+                    cmbMUnivel.setSelectedIndex(1);
+                }
+                txtMUnom.setText(datos[3]);
+                txtMUApellido.setText(datos[4]);
+                txtMUCorreo.setText(datos[5]);
+                txtMUAccion.setText("Modificando");
+                break;
+            }
+        }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    if (!usuarioEncontrado) {
+        txtMUAccion.setText("Creando");
+        // Opcional: Limpiar campos si no se encuentra el usuario
+        txtMUpwd.setText("");
+        txtMUnom.setText("");
+        txtMUApellido.setText("");
+        txtMUCorreo.setText("");
+    }
+}
+
     
     private boolean validarCampos() {
         return !txtMUusuario.getText().trim().isEmpty() &&
@@ -48,28 +122,55 @@ public class MUsuario extends javax.swing.JFrame {
         return cmbMUnivel.getSelectedIndex() == 1; 
     }
     
-    private void guardarDatos() {
-        if (!validarCampos()) {
-            JOptionPane.showMessageDialog(this, "Todos los campos excepto correo son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        String usuario = txtMUusuario.getText();
-        String contrasena = txtMUpwd.getText();
-        String nivel = String.valueOf(cmbMUnivel.getSelectedIndex());
-        String nombre = txtMUnom.getText();
-        String apellido = txtMUApellido.getText();
-        String correo = txtMUCorreo.getText();
-        String datos = usuario + "," + contrasena + "," + nivel + "," + nombre + "," + apellido + "," + correo;
-        
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
-            writer.write(datos);
-            writer.newLine();
-            JOptionPane.showMessageDialog(this, "Usuario guardado exitosamente.");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+private void guardarDatos() {
+    if (!validarCampos()) {
+        JOptionPane.showMessageDialog(this, "Todos los campos excepto correo son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
     }
+
+    String usuario = txtMUusuario.getText();
+    String contrasena = txtMUpwd.getText();
+    String nivel = String.valueOf(cmbMUnivel.getSelectedIndex());
+    String nombre = txtMUnom.getText();
+    String apellido = txtMUApellido.getText();
+    String correo = txtMUCorreo.getText();
+    String nuevaLinea = usuario + "," + contrasena + "," + nivel + "," + nombre + "," + apellido + "," + correo;
+
+    File archivo = new File(FILE_PATH);
+    boolean usuarioExiste = false;
+    StringBuilder contenido = new StringBuilder();
+
+    // Leer el archivo y modificar la línea si el usuario ya existe
+    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length > 0 && datos[0].equals(usuario)) {
+                contenido.append(nuevaLinea).append("\n");
+                usuarioExiste = true;
+            } else {
+                contenido.append(linea).append("\n");
+            }
+        }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // Si el usuario no existe, lo agregamos al final
+    if (!usuarioExiste) {
+        contenido.append(nuevaLinea).append("\n");
+    }
+
+    // Escribir el nuevo contenido en el archivo
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
+        bw.write(contenido.toString());
+        JOptionPane.showMessageDialog(this, usuarioExiste ? "Usuario actualizado correctamente." : "Usuario guardado exitosamente.");
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
     
     private void limpiarCampos() {
         txtMUusuario.setText("");
@@ -166,7 +267,7 @@ public class MUsuario extends javax.swing.JFrame {
             }
         });
 
-        txtMUAccion.setColumns(5);
+        txtMUAccion.setColumns(8);
         txtMUAccion.setEnabled(false);
         txtMUAccion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -276,7 +377,7 @@ public class MUsuario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtMUusuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMUusuarioActionPerformed
-    // TODO add your handling code here:
+    cargarUsuario();
     }//GEN-LAST:event_txtMUusuarioActionPerformed
 
     private void txtMUAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMUAccionActionPerformed

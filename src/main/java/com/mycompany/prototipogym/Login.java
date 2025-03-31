@@ -6,7 +6,6 @@ package com.mycompany.prototipogym;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
@@ -19,7 +18,6 @@ import javax.swing.JOptionPane;
  * @author asist-depti
  */
 public class Login extends javax.swing.JFrame {
-    private static Scanner sc;
     private static int intentos=0;
     private static String user, pwd;
 
@@ -139,9 +137,8 @@ public class Login extends javax.swing.JFrame {
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
             int nLineas = 0;
-            while ((line = br.readLine()) != null) {
+            while ((br.readLine()) != null) {
                 nLineas++;
             }
 
@@ -158,12 +155,12 @@ public class Login extends javax.swing.JFrame {
             user = txtusuario.getText();
             pwd = new String(jPassword1.getPassword());
 
-            Seguridad s = new Seguridad();
+            Seguridad s = new Seguridad(this);
             s.validarUsuario(usuarios, user, pwd, intentos);
         } catch (IOException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
+        
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     /**
