@@ -10,31 +10,37 @@ public class Seguridad {
     }
 
     public void validarUsuario(String[] usuarios, String user, String pwd, int intentos) {
-        boolean encontrado = false;
+    boolean encontrado = false;
 
-        for (int i = 0; i < usuarios.length; i++) {
-            String[] credenciales = usuarios[i].split(",");
-            if (credenciales.length == 2 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
-                JOptionPane.showMessageDialog(null, "Bienvenido " + user, "Inicio de sesión", JOptionPane.INFORMATION_MESSAGE);
-                encontrado = true;
-                login.setIntentos(0); 
-                
-                // Abre el nuevo menú y cierra el Login actual
-                Menu m = new Menu();
-                m.setVisible(true);
-                login.dispose(); // Cierra la ventana correcta
-                
-                return;
-            }
-        }
+    for (int i = 0; i < usuarios.length; i++) {
+        // Divide la línea en partes separadas por coma
+        String[] credenciales = usuarios[i].split(",");
+        
+        // Verifica si la línea tiene al menos dos valores (usuario y contraseña)
+        if (credenciales.length >= 2 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
+            JOptionPane.showMessageDialog(null, "Bienvenido " + user, "Inicio de sesión", JOptionPane.INFORMATION_MESSAGE);
+            encontrado = true;
+            login.setIntentos(0);
 
-        JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos. Intento " + intentos + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
+            // Abre el nuevo menú y cierra el Login actual
+            Menu m = new Menu();
+            m.setVisible(true);
+            login.dispose(); // Cierra la ventana del Login
 
-        if (intentos >= 3) {
-            JOptionPane.showMessageDialog(null, "Tres intentos fallidos. La aplicación se cerrará.", "Error", JOptionPane.WARNING_MESSAGE);
-            System.exit(0);
+            return;
         }
     }
+
+    // Si no se encontró el usuario y la contraseña
+    JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos. Intento " + intentos + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
+
+    // Si ya se han alcanzado 3 intentos fallidos, cierra la aplicación
+    if (intentos >= 3) {
+        JOptionPane.showMessageDialog(null, "Tres intentos fallidos. La aplicación se cerrará.", "Error", JOptionPane.WARNING_MESSAGE);
+        System.exit(0);
+    }
+}
+
 }
 
 

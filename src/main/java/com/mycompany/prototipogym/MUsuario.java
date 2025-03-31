@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author User
  */
 public class MUsuario extends javax.swing.JFrame {
-    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\usuarios.txt";
+    private static final String FILE_PATH = "C:\\Users\\User\\Desktop\\usuarios.txt";
 
     /**
      * Creates new form MUsuario
@@ -32,10 +32,10 @@ public class MUsuario extends javax.swing.JFrame {
     private void verificarEstadoArchivo(String usuario, String contraseña) {
     File archivo = new File(FILE_PATH);
     
-    if (!archivo.exists()) {
-        txtMUAccion.setText("Creando"); // Si el archivo no existe, se está creando
-        return;
-    }
+   // if (!archivo.exists()) {
+    //    txtMUAccion.setText("Creando"); // Si el archivo no existe, se está creando
+   //     return;
+    //}
 
     boolean usuarioEncontrado = false;
 
@@ -43,7 +43,7 @@ public class MUsuario extends javax.swing.JFrame {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
-            if (datos.length >= 2 && datos[0].equals(usuario) && datos[1].equals(contraseña)) {
+            if (datos.length >= 2 && datos[0].equals(usuario) ) {
                 usuarioEncontrado = true;
                 break;
             }
@@ -108,7 +108,10 @@ public class MUsuario extends javax.swing.JFrame {
         txtMUApellido.setText("");
         txtMUCorreo.setText("");
     }
+    
+    
 }
+    
 
     
     private boolean validarCampos() {
