@@ -71,19 +71,21 @@
                                       </Group>
                                   </Group>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                              <Component id="txtMUCorreo" max="32767" attributes="0"/>
-                                              <Component id="txtMUApellido" max="32767" attributes="0"/>
-                                              <Component id="txtMUpwd" alignment="0" max="32767" attributes="0"/>
-                                              <Component id="txtMUnom" max="32767" attributes="0"/>
-                                              <Component id="cmbMUnivel" alignment="0" min="-2" pref="146" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                                           <Component id="jBLimpiar" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="txtMUpwd" min="-2" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                                  <Component id="txtMUCorreo" max="32767" attributes="0"/>
+                                                  <Component id="txtMUApellido" max="32767" attributes="0"/>
+                                                  <Component id="txtMUnom" max="32767" attributes="0"/>
+                                                  <Component id="cmbMUnivel" alignment="0" min="-2" pref="146" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
                                       </Group>
                                   </Group>
                               </Group>
@@ -166,11 +168,6 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtMUusuarioActionPerformed"/>
           </Events>
-        </Component>
-        <Component class="javax.swing.JTextField" name="txtMUpwd">
-          <Properties>
-            <Property name="columns" type="int" value="12"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
@@ -257,6 +254,11 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtMUAccionActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JPasswordField" name="txtMUpwd">
+          <Properties>
+            <Property name="columns" type="int" value="12"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>

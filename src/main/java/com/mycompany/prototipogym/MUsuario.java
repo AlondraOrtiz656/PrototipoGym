@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author User
  */
 public class MUsuario extends javax.swing.JFrame {
-    private static final String FILE_PATH = "C:\\Users\\User\\Desktop\\usuarios.txt";
+    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\usuarios.txt";
 
     /**
      * Creates new form MUsuario
@@ -29,36 +29,7 @@ public class MUsuario extends javax.swing.JFrame {
 
     }
     
-    private void verificarEstadoArchivo(String usuario, String contraseña) {
-    File archivo = new File(FILE_PATH);
-    
-   // if (!archivo.exists()) {
-    //    txtMUAccion.setText("Creando"); // Si el archivo no existe, se está creando
-   //     return;
-    //}
 
-    boolean usuarioEncontrado = false;
-
-    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            String[] datos = linea.split(",");
-            if (datos.length >= 2 && datos[0].equals(usuario) ) {
-                usuarioEncontrado = true;
-                break;
-            }
-        }
-    } catch (IOException e) {
-        txtMUAccion.setText("Error al leer el archivo");
-        return;
-    }
-
-    if (usuarioEncontrado) {
-        txtMUAccion.setText("Modificando");
-    } else {
-        txtMUAccion.setText("Creando");
-    }
-}
 
     private void cargarUsuario() {
     String usuario = txtMUusuario.getText().trim();
@@ -67,7 +38,7 @@ public class MUsuario extends javax.swing.JFrame {
     }
     File archivo = new File(FILE_PATH);
     if(!archivo.exists()){
-        txtMUAccion.setText("Creando");
+        //txtMUAccion.setText("Creando");
         return;
     }
     boolean usuarioEncontrado = false;
@@ -77,17 +48,20 @@ public class MUsuario extends javax.swing.JFrame {
             String[] datos = linea.split(",");
             // Se asume que el registro tiene 6 elementos:
             // [0] usuario, [1] contraseña, [2] nivel, [3] nombre, [4] apellido, [5] correo
-            if(datos.length >= 6 && datos[0].equals(usuario)) {
+            if( datos[0].equals(usuario)) {
                 usuarioEncontrado = true;
                 // Se llenan los campos con la información obtenida:
                 txtMUpwd.setText(datos[1]);
+                txtMUAccion.setText("Modificando");
                 // Ajusta el índice del combo según la información del archivo:
                 // En este ejemplo, si el valor en el archivo es "1" se asocia a "1 Normal" (índice 0),
                 // y si es "0" se asocia a "0 Administrador" (índice 1)
                 if(datos[2].equals("1")){
-                    cmbMUnivel.setSelectedIndex(0);
-                } else if(datos[2].equals("0")){
                     cmbMUnivel.setSelectedIndex(1);
+                    
+                } else if(datos[2].equals("0")){
+                    cmbMUnivel.setSelectedIndex(0);
+                    
                 }
                 txtMUnom.setText(datos[3]);
                 txtMUApellido.setText(datos[4]);
@@ -95,6 +69,7 @@ public class MUsuario extends javax.swing.JFrame {
                 txtMUAccion.setText("Modificando");
                 break;
             }
+
         }
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al leer el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -201,7 +176,6 @@ private void guardarDatos() {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtMUusuario = new javax.swing.JTextField();
-        txtMUpwd = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         txtMUnom = new javax.swing.JTextField();
@@ -215,6 +189,7 @@ private void guardarDatos() {
         jBLimpiar = new javax.swing.JButton();
         jBGuardar = new javax.swing.JButton();
         txtMUAccion = new javax.swing.JTextField();
+        txtMUpwd = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -228,8 +203,6 @@ private void guardarDatos() {
                 txtMUusuarioActionPerformed(evt);
             }
         });
-
-        txtMUpwd.setColumns(12);
 
         jLabel3.setText("Contrasena:");
 
@@ -278,6 +251,8 @@ private void guardarDatos() {
             }
         });
 
+        txtMUpwd.setColumns(12);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -311,16 +286,17 @@ private void guardarDatos() {
                                         .addGap(35, 35, 35)))
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGap(47, 47, 47)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(txtMUCorreo)
-                                            .addComponent(txtMUApellido)
-                                            .addComponent(txtMUpwd)
-                                            .addComponent(txtMUnom)
-                                            .addComponent(cmbMUnivel, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addGap(26, 26, 26)
-                                        .addComponent(jBLimpiar)))))
+                                        .addComponent(jBLimpiar))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(47, 47, 47)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtMUpwd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(txtMUCorreo)
+                                                .addComponent(txtMUApellido)
+                                                .addComponent(txtMUnom)
+                                                .addComponent(cmbMUnivel, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
                         .addGap(73, 73, 73))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -389,14 +365,18 @@ private void guardarDatos() {
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
         limpiarCampos();
+        txtMUAccion.setText("");
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
+        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
         guardarDatos();
+        limpiarCampos();
+        txtMUAccion.setText("");
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     /**
@@ -451,7 +431,7 @@ private void guardarDatos() {
     private javax.swing.JTextField txtMUApellido;
     private javax.swing.JTextField txtMUCorreo;
     private javax.swing.JTextField txtMUnom;
-    private javax.swing.JTextField txtMUpwd;
+    private javax.swing.JPasswordField txtMUpwd;
     private javax.swing.JTextField txtMUusuario;
     // End of variables declaration//GEN-END:variables
 }

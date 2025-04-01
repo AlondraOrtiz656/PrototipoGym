@@ -130,7 +130,7 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
-        File file = new File("C:\\Users\\User\\Desktop\\usuarios.txt");
+        File file = new File("C:\\Users\\asist-depti\\Desktop\\usuarios.txt");
     if (!file.exists()) {
         JOptionPane.showMessageDialog(this, "El archivo de usuarios no existe.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
