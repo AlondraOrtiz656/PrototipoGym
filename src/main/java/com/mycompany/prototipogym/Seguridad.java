@@ -17,7 +17,11 @@ public class Seguridad {
         String[] credenciales = usuarios[i].split(",");
         
         // Verifica si la línea tiene al menos dos valores (usuario y contraseña)
-        if (credenciales.length >= 2 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
+        if (user.isEmpty() || pwd.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Complete los datos. Intento " + intentos + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
+                                
+                return;
+            }else if (credenciales.length >= 2 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
             JOptionPane.showMessageDialog(null, "Bienvenido " + user, "Inicio de sesión", JOptionPane.INFORMATION_MESSAGE);
             encontrado = true;
             login.setIntentos(0);
@@ -28,11 +32,13 @@ public class Seguridad {
             login.dispose(); // Cierra la ventana del Login
 
             return;
-        }
-    }
+        } else {
+            JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos. Intento " + intentos + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+    }}
 
     // Si no se encontró el usuario y la contraseña
-    JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos. Intento " + intentos + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
+    
 
     // Si ya se han alcanzado 3 intentos fallidos, cierra la aplicación
     if (intentos >= 3) {

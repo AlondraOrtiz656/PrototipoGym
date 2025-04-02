@@ -18,12 +18,14 @@ import javax.swing.JOptionPane;
  * @author asist-depti
  */
 public class Login extends javax.swing.JFrame {
-    private static int intentos=0;
+
+    private static int intentos = 0;
     private static String user, pwd;
 
     public static void setIntentos(int Intentos) {
         Login.intentos = intentos;
     }
+
     /**
      * Creates new form Login
      */
@@ -131,35 +133,38 @@ public class Login extends javax.swing.JFrame {
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
         File file = new File("C:\\Users\\asist-depti\\Desktop\\usuarios.txt");
-    if (!file.exists()) {
-        JOptionPane.showMessageDialog(this, "El archivo de usuarios no existe.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        int nLineas = 0;
-        while ((br.readLine()) != null) {
-            nLineas++;
+        if (!file.exists()) {
+            JOptionPane.showMessageDialog(this, "El archivo de usuarios no existe.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
-        String[] usuarios = new String[nLineas];
-        int i = 0;
-
-        try (Scanner sc = new Scanner(file)) {
-            while (sc.hasNextLine()) {
-                usuarios[i++] = sc.nextLine();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            int nLineas = 0;
+            while ((br.readLine()) != null) {
+                nLineas++;
             }
+
+            String[] usuarios = new String[nLineas];
+            int i = 0;
+
+            try (Scanner sc = new Scanner(file)) {
+                while (sc.hasNextLine()) {
+                    usuarios[i++] = sc.nextLine();
+                }
+            }
+
+            intentos++;
+            user = txtusuario.getText();
+            pwd = new String(jPassword1.getPassword());
+            
+            
+            Seguridad s = new Seguridad(this);
+            s.validarUsuario(usuarios, user, pwd, intentos);
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        intentos++;
-        user = txtusuario.getText();
-        pwd = new String(jPassword1.getPassword());
 
-        Seguridad s = new Seguridad(this);
-        s.validarUsuario(usuarios, user, pwd, intentos);
-    } catch (IOException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     /**
