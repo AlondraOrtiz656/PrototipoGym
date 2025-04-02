@@ -25,7 +25,7 @@ public void validarUsuario(String[] usuarios, String user, String pwd, int inten
         } else if (credenciales.length >= 2 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
             JOptionPane.showMessageDialog(null, "Bienvenido " + user, "Inicio de sesión", JOptionPane.INFORMATION_MESSAGE);
             encontrado = true;
-            Login.setIntentos(0);  // Reiniciar intentos en la instancia de Login
+            login.setIntentos(0);  // Reiniciar intentos en la instancia de Login
             
             // Abre el menú y cierra la ventana de Login
             Menu m = new Menu();
@@ -41,7 +41,7 @@ public void validarUsuario(String[] usuarios, String user, String pwd, int inten
         JOptionPane.showMessageDialog(null, "Tres intentos fallidos. La aplicación se cerrará.", "Error", JOptionPane.WARNING_MESSAGE);
         System.exit(0);
     } else {
-        JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos. Intento " + (intentos + 1) + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos. Intento " + intentos + "/3.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
 
