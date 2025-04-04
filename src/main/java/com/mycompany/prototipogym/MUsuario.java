@@ -376,8 +376,10 @@ private void guardarDatos() {
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
         guardarDatos();
-        limpiarCampos();
-        txtMUAccion.setText("");
+        if (validarCampos()) {
+            limpiarCampos();
+            txtMUAccion.setText("");
+        }
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     /**

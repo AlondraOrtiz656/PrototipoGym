@@ -73,6 +73,11 @@ public class Menu extends javax.swing.JFrame {
         jMenu1.add(MUsuario);
 
         MEntrenador.setText("De Entrenador");
+        MEntrenador.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MEntrenadorActionPerformed(evt);
+            }
+        });
         jMenu1.add(MEntrenador);
 
         jMenuItem6.setText("De Localizacion");
@@ -218,6 +223,12 @@ public class Menu extends javax.swing.JFrame {
         MU.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_MUsuarioActionPerformed
+
+    private void MEntrenadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MEntrenadorActionPerformed
+        MEntrenador ME = new MEntrenador();
+        ME.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_MEntrenadorActionPerformed
 
     /**
      * @param args the command line arguments
