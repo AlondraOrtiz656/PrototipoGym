@@ -1,0 +1,2 @@
+1234,tipos
+2121,Exterior
