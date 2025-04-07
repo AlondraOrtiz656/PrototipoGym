@@ -36,7 +36,7 @@ public class MEntrenador extends javax.swing.JFrame {
     try {
         id_entrenador = Integer.parseInt(txtMEid.getText().trim());
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "ID inválido, debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -93,8 +93,16 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Todos los campos (excepto correo y teléfono) son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
-
-    int id_entrenador = Integer.parseInt(txtMEid.getText());
+    
+    int id_entrenador;
+    
+    try {
+        id_entrenador = Integer.parseInt(txtMEid.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID de entrenador inválido. Debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
     String nombre = txtMEnom.getText();
     String apellido = txtMEApellido.getText();
     String telefono = txtMEtele.getText();
@@ -130,10 +138,11 @@ private void guardarDatos() {
     // Escribir el nuevo contenido en el archivo
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
         bw.write(contenido.toString());
-        JOptionPane.showMessageDialog(this, usuarioExiste ? "Usuario actualizado correctamente." : "Usuario guardado exitosamente.");
+        JOptionPane.showMessageDialog(this, usuarioExiste ? "Entrenador actualizado correctamente." : "Entrenador guardado exitosamente.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    limpiarCampos();
 }
 
     
@@ -143,7 +152,7 @@ private void guardarDatos() {
         txtMEApellido.setText("");
         txtMEtele.setText("");
         txtMECorreo.setText("");
-        txtMUAccion.setText("Modificando");
+        txtMUAccion.setText("");
     }
     
     Menu m = new Menu();
@@ -344,21 +353,14 @@ private void guardarDatos() {
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
         limpiarCampos();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
-        guardarDatos();
-        if (validarCampos()) {
-            limpiarCampos();
-            txtMUAccion.setText("");
-        }
-        
+        guardarDatos();        
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     /**

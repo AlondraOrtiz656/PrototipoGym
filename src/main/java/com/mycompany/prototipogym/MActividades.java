@@ -36,7 +36,7 @@ public class MActividades extends javax.swing.JFrame {
     try {
         id_act = Integer.parseInt(txtMAid.getText().trim());
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "ID inválido. Debe ser numérico", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -130,12 +130,21 @@ private void guardarDatos() {
         return;
     }
 
-    int id_act = Integer.parseInt(txtMAid.getText());
+    int id_act;
     String nombre = txtMAnom.getText();
     String descripcion = txtMAdescrip.getText().replace("\n", " ");
-    int id_localizacion = Integer.parseInt(txtMA_IDloca.getText());
-    int id_entrenador = Integer.parseInt(txtMA_IDentre.getText());
-
+    int id_localizacion;
+    int id_entrenador;
+    
+     try {
+        id_act = Integer.parseInt(txtMAid.getText().trim());
+        id_localizacion = Integer.parseInt(txtMA_IDloca.getText());
+        id_entrenador = Integer.parseInt(txtMA_IDentre.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido. Debe ser numérico", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
     // Verificar si el ID de localización existe
     if (!existeIdLocalizacion(id_localizacion)) {
         JOptionPane.showMessageDialog(this, "El ID de localización no existe. Ingrese un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -176,10 +185,12 @@ private void guardarDatos() {
 
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
         bw.write(contenido.toString());
-        JOptionPane.showMessageDialog(this, salaExiste ? "Sala actualizada correctamente." : "Sala guardada exitosamente.");
+        JOptionPane.showMessageDialog(this, salaExiste ? "Actividad actualizada correctamente." : "Actividad guardada exitosamente.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    limpiarCampos();
+
 }
 
 
@@ -190,7 +201,7 @@ private void guardarDatos() {
         txtMAdescrip.setText("");
         txtMA_IDloca.setText("");
         txtMA_IDentre.setText("");        
-        txtMUAccion.setText("Modificando");
+        txtMUAccion.setText("");
     }
     
     Menu m = new Menu();
@@ -415,23 +426,14 @@ private void guardarDatos() {
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
         limpiarCampos();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
-        guardarDatos();
-        int id_localizacion = Integer.parseInt(txtMA_IDloca.getText());
-        int id_entrenador = Integer.parseInt(txtMA_IDentre.getText());
-        if (validarCampos()&& existeIdLocalizacion(id_localizacion)&& existeIdLocalizacion(id_entrenador)) {
-            limpiarCampos();
-            txtMUAccion.setText("");
-        }
-        
+        guardarDatos();        
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMA_IDentreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMA_IDentreActionPerformed

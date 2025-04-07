@@ -36,7 +36,7 @@ public class MLocalizacion extends javax.swing.JFrame {
     try {
             id_localizacion = Integer.parseInt(txtMLid.getText().trim());
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "ID inválido, debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -87,7 +87,15 @@ private void guardarDatos() {
         return;
     }
 
-    int id_localizacion = Integer.parseInt(txtMLid.getText());
+    int id_localizacion;
+    
+    try {
+            id_localizacion = Integer.parseInt(txtMLid.getText().trim());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido, debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
     String tipo = txtMLtipo.getText();
     String nuevaLinea = id_localizacion + "," + tipo;
 
@@ -120,17 +128,18 @@ private void guardarDatos() {
     // Escribir el nuevo contenido en el archivo
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
         bw.write(contenido.toString());
-        JOptionPane.showMessageDialog(this, LocaExiste ? "Usuario actualizado correctamente." : "Usuario guardado exitosamente.");
+        JOptionPane.showMessageDialog(this, LocaExiste ? "Localización actualizado correctamente." : "Localización guardado exitosamente.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    limpiarCampos();
 }
 
     
     private void limpiarCampos() {
         txtMLid.setText("");
         txtMLtipo.setText("");
-        txtMUAccion.setText("Modificando");
+        txtMUAccion.setText("");
     }
     
     Menu m = new Menu();
@@ -288,21 +297,14 @@ private void guardarDatos() {
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
         guardarDatos();
-        if (validarCampos()) {
-            limpiarCampos();
-            txtMUAccion.setText("");
-        }
-
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
         limpiarCampos();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void txtMLidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMLidActionPerformed

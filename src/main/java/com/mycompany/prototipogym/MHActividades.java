@@ -32,15 +32,10 @@ public class MHActividades extends javax.swing.JFrame {
 
 
     private void cargarUsuario() {
-    int id_horario_act;
-    try {
-        id_horario_act = Integer.parseInt(txtMHAid.getText().trim());
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+    String id_horario_act = txtMHAid.getText().trim();
+    
 
-    if (id_horario_act == 0) {
+    if (id_horario_act.isEmpty()) {
         return;
     }
 
@@ -52,7 +47,7 @@ public class MHActividades extends javax.swing.JFrame {
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
 
-                if (Integer.parseInt(datos[0]) == id_horario_act) {
+                if ((datos[0]).equals(id_horario_act)) {
                 idEncontrado = true;
                 // Se llenan los campos con la información obtenida:
                 txtMHAdia.setText(datos[1]);
@@ -110,15 +105,14 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
-
-    int id_horarioact, hora, id_act;
+    String id_horarioact = txtMHAid.getText().trim();
+    int hora, id_act;
 
     try {
-        id_horarioact = Integer.parseInt(txtMHAid.getText().trim());
         hora = Integer.parseInt(txtMHAhora.getText().trim());
         id_act = Integer.parseInt(txtMHA_IDact.getText().trim());
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Ingrese solo números válidos en los campos ID, Hora y ID Actividad.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Ingrese solo números válidos en los campos Hora y ID Actividad.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -140,7 +134,7 @@ private void guardarDatos() {
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
             if (datos.length >= 2) {
-                if (Integer.parseInt(datos[0]) == id_horarioact) {
+                if ((datos[0]).equals(id_horarioact)) {
                     contenido.append(nuevaLinea).append("\n");
                     HorarioActExiste = true;
                 } else {
@@ -159,7 +153,7 @@ private void guardarDatos() {
 
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
         bw.write(contenido.toString());
-        JOptionPane.showMessageDialog(this, HorarioActExiste ? "Horario actualizado correctamente." : "Horario de Actividad guardado exitosamente.");
+        JOptionPane.showMessageDialog(this, HorarioActExiste ? "Horario de Actividad actualizado correctamente." : "Horario de Actividad guardado exitosamente.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
@@ -365,19 +359,15 @@ private void guardarDatos() {
     }//GEN-LAST:event_txtMUAccionActionPerformed
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
-        limpiarCampos();
-        
+        limpiarCampos();        
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
-        cancelar();
-        
+        cancelar();        
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
-        guardarDatos();
-        
-        
+        guardarDatos();     
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMHA_IDactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMHA_IDactActionPerformed

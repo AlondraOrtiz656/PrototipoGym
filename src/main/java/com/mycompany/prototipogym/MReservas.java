@@ -35,13 +35,7 @@ public class MReservas extends javax.swing.JFrame {
 
 
     private void cargarUsuario() {
-    String id_reservas;
-    try {
-        id_reservas = txtMRid.getText().trim();
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+    String id_reservas = txtMRid.getText().trim();
 
     if (id_reservas.isEmpty()) {
         return;
@@ -60,7 +54,9 @@ public class MReservas extends javax.swing.JFrame {
                 // Se llenan los campos con la información obtenida:
                 txtMR_IDsalareserva.setText(datos[1]);
                 txtMR_IDclientereser.setText(datos[2]);
-                txtMRfechareser.setText(datos[3]);
+                DateTimeFormatter formatoMostrar = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                LocalDate fechaReserva = LocalDate.parse(datos[3]);
+                txtMRfechareser.setText(fechaReserva.format(formatoMostrar));
                 txtMR_IDhorarioreser.setText(datos[4]);
                 txtMR_IDestadoreser.setText(datos[5]);
                 txtMUAccion.setText("Modificando");
@@ -137,14 +133,14 @@ public class MReservas extends javax.swing.JFrame {
         return false; // No se encontró el ID
     }
     
-    private boolean existeIdEstadoReserva(int estado_reserva) {
+    private boolean existeIdEstadoReserva(String estado_reserva) {
         File archivo = new File("archivos/estado_reserva.txt");
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (Integer.parseInt(datos[0]) == estado_reserva) {
+                if ((datos[0]).equals(estado_reserva)) {
                     return true; // Se encontró el ID en el archivo de entrenador
                 }
             }
@@ -171,8 +167,15 @@ private void guardarDatos() {
     }
 
     String id_reservas = txtMRid.getText();
-    int id_salareserva = Integer.parseInt(txtMR_IDhorarioreser.getText());
-    int id_cliente = Integer.parseInt(txtMR_IDestadoreser.getText());
+    int id_salareserva;
+    int id_cliente;
+    try {
+        id_salareserva = Integer.parseInt(txtMR_IDhorarioreser.getText());
+        id_cliente = Integer.parseInt(txtMR_IDclientereser.getText());        
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido. Debe ser numérico", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
     
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
@@ -185,8 +188,16 @@ private void guardarDatos() {
         return;
     }
     
-    int id_reserva_actividad = Integer.parseInt(txtMR_IDhorarioreser.getText());
-    int id_estado_reserva = Integer.parseInt(txtMR_IDestadoreser.getText());
+    int id_reserva_actividad;
+    
+    try {
+        id_reserva_actividad = Integer.parseInt(txtMR_IDhorarioreser.getText());       
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido. Debe ser numérico", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    String id_estado_reserva = txtMR_IDestadoreser.getText();
 
     // Verificar si los ID existen
     if (!existeIdSalas(id_salareserva)) {
@@ -243,12 +254,12 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     limpiarCampos();
-    txtMUAccion.setText("");
 }
 
 
     
     private void limpiarCampos() {
+        txtMRid.setText("");
         txtMR_IDsalareserva.setText("");
         txtMR_IDclientereser.setText("");
         txtMRfechareser.setText("");

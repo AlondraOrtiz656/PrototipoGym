@@ -36,7 +36,7 @@ public class MSalas extends javax.swing.JFrame {
     try {
         id_sala = Integer.parseInt(txtMSid.getText().trim());
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "ID inválido, debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -111,10 +111,25 @@ private void guardarDatos() {
         return;
     }
 
-    int id_sala = Integer.parseInt(txtMSid.getText());
+    int id_sala;
+    
+    try {
+        id_sala = Integer.parseInt(txtMSid.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID de salas inválido. Debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
     String nombre = txtMSnom.getText();
     String descripcion = txtMSdescrip.getText().replace("\n", " ");
-    int id_localizacion = Integer.parseInt(txtMS_IDloca.getText());
+    int id_localizacion;
+
+    try {
+        id_localizacion = Integer.parseInt(txtMS_IDloca.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID de localización inválido. Debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
     // Verificar si el ID de localización existe
     if (!existeIdLocalizacion(id_localizacion)) {
@@ -155,7 +170,9 @@ private void guardarDatos() {
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    limpiarCampos();
 }
+
 
 
     
@@ -164,7 +181,7 @@ private void guardarDatos() {
         txtMSnom.setText("");
         txtMSdescrip.setText("");
         txtMS_IDloca.setText("");        
-        txtMUAccion.setText("Modificando");
+        txtMUAccion.setText("");
     }
     
     Menu m = new Menu();
@@ -367,22 +384,14 @@ private void guardarDatos() {
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
         limpiarCampos();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
-        guardarDatos();
-        int id_localizacion = Integer.parseInt(txtMS_IDloca.getText());
-        if (validarCampos()&& existeIdLocalizacion(id_localizacion)) {
-            limpiarCampos();
-            txtMUAccion.setText("");
-        }
-        
+        guardarDatos();        
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMS_IDlocaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMS_IDlocaActionPerformed

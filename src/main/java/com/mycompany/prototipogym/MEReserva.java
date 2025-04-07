@@ -32,14 +32,8 @@ public class MEReserva extends javax.swing.JFrame {
 
 
     private void cargarUsuario() {
-    String id_EReserva;
-    try {
-            id_EReserva = txtMERid.getText().trim();
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
+    String id_EReserva = txtMERid.getText().trim();
+    
     if (id_EReserva.isEmpty()) {
         return;
     }
@@ -72,6 +66,7 @@ public class MEReserva extends javax.swing.JFrame {
         cmbMERestado.setSelectedIndex(0);
         txtMUAccion.setText("Creando");
     }
+    
 }
 
        
@@ -123,6 +118,7 @@ private void guardarDatos() {
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    limpiarCampos();
 }
 
     
@@ -290,21 +286,14 @@ private void guardarDatos() {
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
         guardarDatos();
-        if (validarCampos()) {
-            limpiarCampos();
-            txtMUAccion.setText("");
-        }
-
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
-        limpiarCampos();
-        txtMUAccion.setText("");
+        limpiarCampos();        
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void txtMERidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMERidActionPerformed

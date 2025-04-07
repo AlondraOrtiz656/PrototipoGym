@@ -54,11 +54,11 @@ public class MUsuario extends javax.swing.JFrame {
                 // Ajusta el índice del combo según la información del archivo:
                 // En este ejemplo, si el valor en el archivo es "1" se asocia a "1 Normal" (índice 0),
                 // y si es "0" se asocia a "0 Administrador" (índice 1)
-                if(datos[2].equals("1")){
-                    cmbMUnivel.setSelectedIndex(1);
-                    
-                } else if(datos[2].equals("0")){
+                if(datos[2].equals("0")){
                     cmbMUnivel.setSelectedIndex(0);
+                    
+                } else if(datos[2].equals("1")){
+                    cmbMUnivel.setSelectedIndex(1);
                     
                 }
                 txtMUnom.setText(datos[3]);
@@ -145,7 +145,6 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     limpiarCampos();
-    txtMUAccion.setText("");
 }
 
     
@@ -224,6 +223,11 @@ private void guardarDatos() {
         jLabel7.setText("Correo:");
 
         cmbMUnivel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 Normal", "0 Administrador" }));
+        cmbMUnivel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbMUnivelActionPerformed(evt);
+            }
+        });
 
         jBCancelar.setText("Cancelar");
         jBCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -377,6 +381,10 @@ private void guardarDatos() {
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
         guardarDatos();
     }//GEN-LAST:event_jBGuardarActionPerformed
+
+    private void cmbMUnivelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMUnivelActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbMUnivelActionPerformed
 
     /**
      * @param args the command line arguments

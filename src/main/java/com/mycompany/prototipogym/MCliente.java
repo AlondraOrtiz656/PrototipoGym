@@ -125,17 +125,21 @@ private void guardarDatos() {
         return;
     }
 
-    int id_cliente = Integer.parseInt(txtMCid.getText());
+    int id_cliente;
+    try {
+        id_cliente = Integer.parseInt(txtMCid.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID de cliente inválido. Debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
     String nombre = txtMCnom.getText();
     String apellidop = txtMCapellidop.getText();
     String apellidom = txtMCapellidom.getText();
-    String dirrecion = jtaMCdirrec.getText().replace("\n", " ");
+    String dirrecion = jtaMCdirrec.getText().replace("\n", " ").replace(",", "");
 
-    // Formato esperado: dd-MM-yyyy
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-    LocalDate fechanac;
-    LocalDate fechaingre;
+    LocalDate fechanac, fechaingre;
 
     try {
         fechanac = LocalDate.parse(txtMCfechanac.getText(), formatter);
@@ -144,23 +148,42 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use dd-MM-yyyy (ej: 05-04-2025).", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
-    
-    double balance = 0.0;
-    double cuota = 0.0;
-    
-    txtMCbalance.setText(String.valueOf(balance));
-    txtMCvalorcuota.setText(String.valueOf(cuota));
-    
+
     String telefono = txtMCtele.getText();
     String celular = txtMCcelular.getText();
     String status = String.valueOf(cmbMCstatus.getSelectedItem());
-    String tipocliente = txtMCtipocliente.getText();
+
+    int tipocliente;
+    try {
+        tipocliente = Integer.parseInt(txtMCtipocliente.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Tipo de cliente inválido. Debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
     String correo = txtMCcorreo.getText();
-    balance = Double.parseDouble(txtMCbalance.getText());
-    cuota = Double.parseDouble(txtMCvalorcuota.getText());
-    // Convertimos la fecha de nuevo a cadena en el formato deseado
-    String nuevaLinea = id_cliente + "," + nombre + "," + apellidop + "," + apellidom + "," + dirrecion + "," + fechanac.format(formatter)
-    + "," + telefono + "," + celular + "," + fechaingre.format(formatter) + "," + status + "," + tipocliente + "," + correo + "," + balance + "," + cuota;
+
+    double balance = 0.0;
+    double cuota = 0.0;
+
+    try {
+        balance = Double.parseDouble(txtMCbalance.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Balance inválido. Se establecerá en 0.0 por defecto.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+
+    try {
+        cuota = Double.parseDouble(txtMCvalorcuota.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Cuota inválida. Se establecerá en 0.0 por defecto.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+
+    txtMCbalance.setText(String.valueOf(balance));
+    txtMCvalorcuota.setText(String.valueOf(cuota));
+
+    String nuevaLinea = id_cliente + "," + nombre + "," + apellidop + "," + apellidom + "," + dirrecion + "," +
+            fechanac.format(formatter) + "," + telefono + "," + celular + "," + fechaingre.format(formatter) + "," +
+            status + "," + tipocliente + "," + correo + "," + balance + "," + cuota;
 
     File archivo = new File(FILE_PATH);
     boolean clienteExiste = false;
@@ -193,8 +216,9 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    limpiarCampos();    
+    limpiarCampos();
 }
+
 
     
     private void limpiarCampos() {

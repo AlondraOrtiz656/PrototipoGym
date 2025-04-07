@@ -39,7 +39,7 @@ public class MRActividades extends javax.swing.JFrame {
     try {
         id_reservaact = Integer.parseInt(txtMRAid.getText().trim());
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "ID inválido. Deber ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -55,11 +55,17 @@ public class MRActividades extends javax.swing.JFrame {
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
 
-                if ((datos[0]).equals(id_reservaact)) {
+            if (datos[0].equals(String.valueOf(id_reservaact))) {
                 idEncontrado = true;
                 // Se llenan los campos con la información obtenida:
-                txtMRAfechareser.setText(datos[1]);
-                txtMRAfechabaja.setText(datos[2]);
+                DateTimeFormatter formatoMostrar = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+                LocalDate fechaReserva = LocalDate.parse(datos[1]);
+                LocalDate fechaBaja = LocalDate.parse(datos[2]);
+
+                txtMRAfechareser.setText(fechaReserva.format(formatoMostrar));
+                txtMRAfechabaja.setText(fechaBaja.format(formatoMostrar));
+
                 txtMRA_IDestadoreser.setText(datos[3]);
                 txtMRA_IDcliente.setText(datos[4]);
                 txtMRA_IDact.setText(datos[5]);
@@ -174,7 +180,13 @@ private void guardarDatos() {
         return;
     }
 
-    int id_estado_reserva = Integer.parseInt(txtMRAid.getText());
+    int id_estado_reserva;
+    
+    try {
+            id_estado_reserva = Integer.parseInt(txtMRAid.getText());    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido. Deber ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
     
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
@@ -189,10 +201,19 @@ private void guardarDatos() {
         return;
     }
     
-    String id_estadoreser = txtMRA_IDcliente.getText();
-    int id_cliente = Integer.parseInt(txtMRA_IDact.getText());    
-    int id_actividad = Integer.parseInt(txtMRA_IDcliente.getText());
-    String id_horarioact = txtMRA_IDact.getText();
+    String id_estadoreser = txtMRA_IDestadoreser.getText();
+    int id_cliente;    
+    int id_actividad;
+    
+    try {
+            id_cliente = Integer.parseInt(txtMRA_IDcliente.getText());    
+            id_actividad = Integer.parseInt(txtMRA_IDact.getText());    
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido. Deber ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    String id_horarioact = txtMRA_IDhorarioact.getText();
 
     // Verificar si los ID existen
     if (!existeIdEstadoReserva(id_estadoreser)) {
@@ -250,12 +271,12 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     limpiarCampos();
-    txtMUAccion.setText("");
 }
 
 
     
     private void limpiarCampos() {
+        txtMRAid.setText("");
         txtMRAfechareser.setText("");
         txtMRAfechabaja.setText("");
         txtMRA_IDestadoreser.setText("");
