@@ -74,6 +74,11 @@ public class Login extends javax.swing.JFrame {
         jLabel3.setText("foto");
 
         btnSalir.setText("Cancelar");
+        btnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -132,7 +137,7 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
-        File file = new File("src/usuarios.txt");
+        File file = new File("archivos/usuarios.txt");
         if (!file.exists()) {
             JOptionPane.showMessageDialog(this, "El archivo de usuarios no existe.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -166,6 +171,10 @@ public class Login extends javax.swing.JFrame {
 
 
     }//GEN-LAST:event_btnIngresarActionPerformed
+
+    private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_btnSalirActionPerformed
 
     /**
      * @param args the command line arguments

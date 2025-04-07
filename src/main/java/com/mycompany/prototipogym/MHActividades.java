@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author asist-depti
  */
 public class MHActividades extends javax.swing.JFrame {
-    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\horario_act.txt";
+    private static final String FILE_PATH = "archivos/horario_act.txt";
 
     /**
      * Creates new form MHActividades
@@ -80,7 +80,7 @@ public class MHActividades extends javax.swing.JFrame {
 }
 
     private boolean existeIdActividad(int id_act) {
-        File archivo = new File("C:\\Users\\asist-depti\\Desktop\\actividades.txt");
+        File archivo = new File("archivos/actividades.txt");
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;

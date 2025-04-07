@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author asist-depti
  */
 public class MSalas extends javax.swing.JFrame {
-    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\salas.txt";
+    private static final String FILE_PATH = "archivos/salas.txt";
 
     /**
      * Creates new form MSalas
@@ -80,7 +80,7 @@ public class MSalas extends javax.swing.JFrame {
 }
 
     private boolean existeIdLocalizacion(int id_localizacion) {
-        File archivo = new File("C:\\Users\\asist-depti\\Desktop\\localizacion.txt");
+        File archivo = new File("archivos/localizacion.txt");
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;

@@ -16,15 +16,15 @@ import javax.swing.JOptionPane;
  *
  * @author asist-depti
  */
-public class MLocalizacion extends javax.swing.JFrame {
-    private static final String FILE_PATH = "archivos/localizacion.txt";
+public class MEReserva extends javax.swing.JFrame {
+    private static final String FILE_PATH = "archivos/estado_reserva.txt";
 
     /**
      * Creates new form MUsuario
      */
-    public MLocalizacion() {
+    public MEReserva() {
         initComponents();
-        setTitle("Mantenimiento de Localización");
+        setTitle("Mantenimiento de Estado de Reserva");
         setLocationRelativeTo(null);
 
     }
@@ -32,15 +32,15 @@ public class MLocalizacion extends javax.swing.JFrame {
 
 
     private void cargarUsuario() {
-    int id_localizacion;
+    String id_EReserva;
     try {
-            id_localizacion = Integer.parseInt(txtMLid.getText().trim());
+            id_EReserva = txtMERid.getText().trim();
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(this, "ID inválido.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
-    if (id_localizacion == 0) {
+    if (id_EReserva.isEmpty()) {
         return;
     }
 
@@ -52,10 +52,10 @@ public class MLocalizacion extends javax.swing.JFrame {
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
 
-                        if (Integer.parseInt(datos[0]) == id_localizacion) {
+                        if ((datos[0]).equals(id_EReserva)) {
                 idEncontrado = true;
                 // Se llenan los campos con la información obtenida:
-                txtMLtipo.setText(datos[1]);
+                cmbMERestado.setSelectedItem(datos[1]);
                 txtMUAccion.setText("Modificando");
                 break;
             }
@@ -69,15 +69,14 @@ public class MLocalizacion extends javax.swing.JFrame {
     }
 
     if (!idEncontrado) {
-        txtMLtipo.setText("");
+        cmbMERestado.setSelectedIndex(0);
         txtMUAccion.setText("Creando");
     }
 }
 
        
     private boolean validarCampos() {
-        return !txtMLid.getText().trim().isEmpty() &&
-               !txtMLtipo.getText().trim().isEmpty();
+        return !txtMERid.getText().trim().isEmpty();
     }
     
     
@@ -87,12 +86,12 @@ private void guardarDatos() {
         return;
     }
 
-    int id_localizacion = Integer.parseInt(txtMLid.getText());
-    String tipo = txtMLtipo.getText();
-    String nuevaLinea = id_localizacion + "," + tipo;
+    String id_EReserva = txtMERid.getText();
+    String estado = String.valueOf(cmbMERestado.getSelectedItem());
+    String nuevaLinea = id_EReserva + "," + estado;
 
     File archivo = new File(FILE_PATH);
-    boolean LocaExiste = false;
+    boolean MERExiste = false;
     StringBuilder contenido = new StringBuilder();
 
     // Leer el archivo y modificar la línea si el usuario ya existe
@@ -100,9 +99,9 @@ private void guardarDatos() {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
-            if (datos.length > 0 && Integer.parseInt(datos[0]) == id_localizacion) {
+            if (datos.length > 0 && (datos[0]).equals (id_EReserva)) {
                 contenido.append(nuevaLinea).append("\n");
-                LocaExiste = true;
+                MERExiste = true;
             } else {
                 contenido.append(linea).append("\n");
             }
@@ -113,14 +112,14 @@ private void guardarDatos() {
     }
 
     // Si el usuario no existe, lo agregamos al final
-    if (!LocaExiste) {
+    if (!MERExiste) {
         contenido.append(nuevaLinea).append("\n");
     }
 
     // Escribir el nuevo contenido en el archivo
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
         bw.write(contenido.toString());
-        JOptionPane.showMessageDialog(this, LocaExiste ? "Usuario actualizado correctamente." : "Usuario guardado exitosamente.");
+        JOptionPane.showMessageDialog(this, MERExiste ? "Estado de Reserva actualizado correctamente." : "Estado de Reserva guardado exitosamente.");
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
@@ -128,9 +127,9 @@ private void guardarDatos() {
 
     
     private void limpiarCampos() {
-        txtMLid.setText("");
-        txtMLtipo.setText("");
-        txtMUAccion.setText("Modificando");
+        txtMERid.setText("");
+        cmbMERestado.setSelectedIndex(0);
+        txtMUAccion.setText("");
     }
     
     Menu m = new Menu();
@@ -152,30 +151,28 @@ private void guardarDatos() {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        txtMLid = new javax.swing.JTextField();
-        txtMLtipo = new javax.swing.JTextField();
+        txtMERid = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jBCancelar = new javax.swing.JButton();
         jBLimpiar = new javax.swing.JButton();
         jBGuardar = new javax.swing.JButton();
         txtMUAccion = new javax.swing.JTextField();
+        cmbMERestado = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Mantenimiento de Localización");
+        jLabel1.setText("Mantenimiento de Estado de Reserva");
 
-        jLabel2.setText("ID Localización:");
+        jLabel2.setText("ID Estado de Reserva:");
 
-        txtMLid.setColumns(12);
-        txtMLid.addActionListener(new java.awt.event.ActionListener() {
+        txtMERid.setColumns(12);
+        txtMERid.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMLidActionPerformed(evt);
+                txtMERidActionPerformed(evt);
             }
         });
 
-        txtMLtipo.setColumns(12);
-
-        jLabel5.setText("Tipo:");
+        jLabel5.setText("Estado:");
 
         jBCancelar.setText("Cancelar");
         jBCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -206,61 +203,66 @@ private void guardarDatos() {
             }
         });
 
+        cmbMERestado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2" }));
+        cmbMERestado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbMERestadoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(135, 135, 135)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(txtMUAccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(66, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jBGuardar)
                         .addGap(38, 38, 38))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtMUAccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(25, 25, 25))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jBCancelar)
-                                .addGap(61, 61, 61)
-                                .addComponent(jBLimpiar))
+                                .addGap(55, 55, 55)
+                                .addComponent(jBLimpiar)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(24, 24, 24)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtMLid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel5)
-                                        .addGap(87, 87, 87)
-                                        .addComponent(txtMLtipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(73, 73, 73))))
+                                        .addGap(87, 87, 87)))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(cmbMERestado, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(txtMERid))))
+                        .addGap(73, 73, 73))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(95, 95, 95))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(txtMUAccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(58, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addGap(29, 29, 29)))
+                .addGap(16, 16, 16)
+                .addComponent(txtMUAccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txtMLid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(46, 46, 46)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtMERid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(49, 49, 49)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(txtMLtipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(40, 40, 40)
+                    .addComponent(cmbMERestado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(37, 37, 37)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBCancelar)
                     .addComponent(jBLimpiar)
@@ -305,9 +307,13 @@ private void guardarDatos() {
         txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
-    private void txtMLidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMLidActionPerformed
+    private void txtMERidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMERidActionPerformed
         cargarUsuario();
-    }//GEN-LAST:event_txtMLidActionPerformed
+    }//GEN-LAST:event_txtMERidActionPerformed
+
+    private void cmbMERestadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMERestadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbMERestadoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -326,14 +332,18 @@ private void guardarDatos() {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MLocalizacion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MEReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MLocalizacion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MEReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MLocalizacion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MEReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MLocalizacion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MEReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -342,12 +352,13 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MLocalizacion().setVisible(true);
+                new MEReserva().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cmbMERestado;
     private javax.swing.JButton jBCancelar;
     private javax.swing.JButton jBGuardar;
     private javax.swing.JButton jBLimpiar;
@@ -355,8 +366,7 @@ private void guardarDatos() {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField txtMLid;
-    private javax.swing.JTextField txtMLtipo;
+    private javax.swing.JTextField txtMERid;
     private javax.swing.JTextField txtMUAccion;
     // End of variables declaration//GEN-END:variables
 }

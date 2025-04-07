@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author User
  */
 public class MEntrenador extends javax.swing.JFrame {
-    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\entrenador.txt";
+    private static final String FILE_PATH = "archivos/entrenador.txt";
 
     /**
      * Creates new form MUsuario

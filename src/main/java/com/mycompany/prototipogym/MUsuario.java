@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author User
  */
 public class MUsuario extends javax.swing.JFrame {
-    private static final String FILE_PATH = "C:\\Users\\asist-depti\\Desktop\\usuarios.txt";
+    private static final String FILE_PATH = "archivos/usuarios.txt";
 
     /**
      * Creates new form MUsuario
@@ -75,7 +75,6 @@ public class MUsuario extends javax.swing.JFrame {
     }
     if (!usuarioEncontrado) {
         txtMUAccion.setText("Creando");
-        // Opcional: Limpiar campos si no se encuentra el usuario
         txtMUpwd.setText("");
         txtMUnom.setText("");
         txtMUApellido.setText("");
@@ -145,6 +144,8 @@ private void guardarDatos() {
     } catch (IOException e) {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    limpiarCampos();
+    txtMUAccion.setText("");
 }
 
     
@@ -155,6 +156,7 @@ private void guardarDatos() {
         txtMUApellido.setText("");
         txtMUCorreo.setText("");
         cmbMUnivel.setSelectedIndex(0);
+        txtMUAccion.setText("");
     }
     
     Menu m = new Menu();
@@ -365,21 +367,15 @@ private void guardarDatos() {
     }//GEN-LAST:event_txtMUAccionActionPerformed
 
     private void jBLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpiarActionPerformed
-        limpiarCampos();
-        txtMUAccion.setText("");
+        limpiarCampos();        
     }//GEN-LAST:event_jBLimpiarActionPerformed
 
     private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
         cancelar();
-        txtMUAccion.setText("");
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
         guardarDatos();
-        if (validarCampos()) {
-            limpiarCampos();
-            txtMUAccion.setText("");
-        }
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     /**
