@@ -18,14 +18,17 @@ import javax.swing.JOptionPane;
  */
 public class MLocalizacion extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/localizacion.txt";
+    private Menu menuOriginal;
 
     /**
      * Creates new form MUsuario
      */
-    public MLocalizacion() {
+    public MLocalizacion(Menu menu) {
         initComponents();
         setTitle("Mantenimiento de Localización");
         setLocationRelativeTo(null);
+        this.menuOriginal = menu;
+
 
     }
     
@@ -142,11 +145,12 @@ private void guardarDatos() {
         txtMUAccion.setText("");
     }
     
-    Menu m = new Menu();
     
     private void cancelar() {
-        dispose();
-        m.setVisible(true);
+        this.dispose();  // cierras MSalas
+        if (menuOriginal != null) {
+        menuOriginal.setVisible(true);  // vuelves al menú anterior
+    }
     }
 
     /**
@@ -344,7 +348,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MLocalizacion().setVisible(true);
+                //new MLocalizacion().setVisible(true);
             }
         });
     }

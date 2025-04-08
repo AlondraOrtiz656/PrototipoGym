@@ -18,14 +18,17 @@ import javax.swing.JOptionPane;
  */
 public class MActividades extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/actividades.txt";
+    private Menu menuOriginal;
 
+        
     /**
      * Creates new form MActividades
      */
-    public MActividades() {
+    public MActividades(Menu menu) {
         initComponents();
         setTitle("Mantenimiento de Actvidades");
         setLocationRelativeTo(null);
+        this.menuOriginal = menu;
 
     }
     
@@ -132,7 +135,7 @@ private void guardarDatos() {
 
     int id_act;
     String nombre = txtMAnom.getText();
-    String descripcion = txtMAdescrip.getText().replace("\n", " ");
+    String descripcion = txtMAdescrip.getText().replace("\n", " ").replace(",", "");
     int id_localizacion;
     int id_entrenador;
     
@@ -204,11 +207,12 @@ private void guardarDatos() {
         txtMUAccion.setText("");
     }
     
-    Menu m = new Menu();
     
     private void cancelar() {
-        dispose();
-        m.setVisible(true);
+        this.dispose();  // cierras MSalas
+        if (menuOriginal != null) {
+        menuOriginal.setVisible(true);  // vuelves al menú anterior
+    }
     }
 
     /**
@@ -485,7 +489,6 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MActividades().setVisible(true);
             }
         });
     }

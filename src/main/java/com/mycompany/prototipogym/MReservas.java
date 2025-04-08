@@ -10,9 +10,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,14 +22,17 @@ import javax.swing.JOptionPane;
  */
 public class MReservas extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/reservas.txt";
+    private Menu menuOriginal;
+
 
     /**
      * Creates new form MActividades
      */
-    public MReservas() {
+    public MReservas(Menu menu) {
         initComponents();
         setTitle("Mantenimiento de Reservas");
         setLocationRelativeTo(null);
+        this.menuOriginal = menu;
 
     }
     
@@ -53,10 +57,15 @@ public class MReservas extends javax.swing.JFrame {
                 idEncontrado = true;
                 // Se llenan los campos con la información obtenida:
                 txtMR_IDsalareserva.setText(datos[1]);
-                txtMR_IDclientereser.setText(datos[2]);
-                DateTimeFormatter formatoMostrar = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                LocalDate fechaReserva = LocalDate.parse(datos[3]);
-                txtMRfechareser.setText(fechaReserva.format(formatoMostrar));
+                txtMR_IDclientereser.setText(datos[2]);                
+                String fechaString = datos[3];
+                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
+                try {
+                    Date fecha = sdf.parse(fechaString);  // Convierte la fecha de texto a un objeto Date
+                    fechareserChooser.setDate(fecha);  // Asigna la fecha al componente de selección de fecha
+                } catch (ParseException e) {
+                    JOptionPane.showMessageDialog(this, "Error al parsear la fecha. Verifica el formato (ej. '9 abr 2025').", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 txtMR_IDhorarioreser.setText(datos[4]);
                 txtMR_IDestadoreser.setText(datos[5]);
                 txtMUAccion.setText("Modificando");
@@ -75,7 +84,7 @@ public class MReservas extends javax.swing.JFrame {
     if (!idEncontrado) {
         txtMR_IDsalareserva.setText("");
         txtMR_IDclientereser.setText("");
-        txtMRfechareser.setText("");
+        fechareserChooser.setDate(null);
         txtMR_IDhorarioreser.setText("");
         txtMR_IDestadoreser.setText("");
         txtMUAccion.setText("Creando");
@@ -154,7 +163,7 @@ public class MReservas extends javax.swing.JFrame {
     private boolean validarCampos() {
         return !txtMR_IDsalareserva.getText().trim().isEmpty() &&
                !txtMR_IDclientereser.getText().trim().isEmpty() &&
-               !txtMRfechareser.getText().trim().isEmpty() &&
+               fechareserChooser.getDate() != null &&
                !txtMR_IDhorarioreser.getText().trim().isEmpty() &&
                !txtMR_IDestadoreser.getText().trim().isEmpty();
     }
@@ -177,14 +186,10 @@ private void guardarDatos() {
         return;
     }
     
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    Date fechareserDate = fechareserChooser.getDate();
 
-    LocalDate fechareser;    
-
-    try {
-        fechareser = LocalDate.parse(txtMRfechareser.getText(), formatter);
-    } catch (DateTimeParseException e) {
-        JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use dd-MM-yyyy (ej: 05-04-2025).", "Error", JOptionPane.ERROR_MESSAGE);
+    if (fechareserDate == null) {
+        JOptionPane.showMessageDialog(this, "Debe seleccionar una fecha válida.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
     
@@ -219,8 +224,10 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "El ID de estado de reserva no existe. Ingrese un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
+    SimpleDateFormat sdfGuardar = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES"));
+    String fechaFormateada = sdfGuardar.format(fechareserDate);  // Formatea la fecha a "9 abr 2025"
+    String nuevaLinea = id_reservas + "," + id_salareserva + "," + id_cliente + "," + fechaFormateada + "," + id_reserva_actividad + "," + id_estado_reserva;
 
-    String nuevaLinea = id_reservas + "," + id_salareserva + "," + id_cliente + "," + fechareser + "," + id_reserva_actividad + "," + id_estado_reserva;
     File archivo = new File(FILE_PATH);
     boolean reservaExiste = false;
     StringBuilder contenido = new StringBuilder();
@@ -262,17 +269,18 @@ private void guardarDatos() {
         txtMRid.setText("");
         txtMR_IDsalareserva.setText("");
         txtMR_IDclientereser.setText("");
-        txtMRfechareser.setText("");
+        fechareserChooser.setDate(null);
         txtMR_IDhorarioreser.setText("");
         txtMR_IDestadoreser.setText("");
         txtMUAccion.setText("");
     }
     
-    Menu m = new Menu();
     
     private void cancelar() {
-        dispose();
-        m.setVisible(true);
+        this.dispose();  // cierras MSalas
+        if (menuOriginal != null) {
+        menuOriginal.setVisible(true);  // vuelves al menú anterior
+    }
     }
 
     /**
@@ -300,10 +308,10 @@ private void guardarDatos() {
         txtMR_IDestadoreser = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtMR_IDhorarioreser = new javax.swing.JTextField();
-        txtMRfechareser = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         txtMR_IDclientereser = new javax.swing.JTextField();
+        fechareserChooser = new com.toedter.calendar.JDateChooser();
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -378,13 +386,6 @@ private void guardarDatos() {
             }
         });
 
-        txtMRfechareser.setColumns(12);
-        txtMRfechareser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMRfechareserActionPerformed(evt);
-            }
-        });
-
         jLabel7.setText("Fecha Reserva:");
 
         jLabel8.setText("ID Cliente Reserva:");
@@ -421,25 +422,27 @@ private void guardarDatos() {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(24, 24, 24)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+                                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                         .addGap(36, 36, 36)
-                                        .addComponent(txtMRfechareser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(txtMR_IDhorarioreser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
-                                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addGap(36, 36, 36)
-                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                .addComponent(txtMRid, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(txtMR_IDestadoreser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(txtMR_IDsalareserva, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(txtMRid, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtMR_IDestadoreser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtMR_IDsalareserva, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(36, 36, 36)))
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(txtMR_IDhorarioreser)
+                                            .addComponent(fechareserChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGap(36, 36, 36)
@@ -469,9 +472,9 @@ private void guardarDatos() {
                     .addComponent(jLabel8)
                     .addComponent(txtMR_IDclientereser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
-                    .addComponent(txtMRfechareser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fechareserChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMR_IDhorarioreser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -535,10 +538,6 @@ private void guardarDatos() {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtMR_IDhorarioreserActionPerformed
 
-    private void txtMRfechareserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMRfechareserActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtMRfechareserActionPerformed
-
     private void txtMR_IDclientereserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMR_IDclientereserActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtMR_IDclientereserActionPerformed
@@ -588,12 +587,13 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MReservas().setVisible(true);
+                //new MReservas().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private com.toedter.calendar.JDateChooser fechareserChooser;
     private javax.swing.JButton jBCancelar;
     private javax.swing.JButton jBGuardar;
     private javax.swing.JButton jBLimpiar;
@@ -611,7 +611,6 @@ private void guardarDatos() {
     private javax.swing.JTextField txtMR_IDestadoreser;
     private javax.swing.JTextField txtMR_IDhorarioreser;
     private javax.swing.JTextField txtMR_IDsalareserva;
-    private javax.swing.JTextField txtMRfechareser;
     private javax.swing.JTextField txtMRid;
     private javax.swing.JTextField txtMUAccion;
     // End of variables declaration//GEN-END:variables

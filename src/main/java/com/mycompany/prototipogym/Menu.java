@@ -28,7 +28,7 @@ public class Menu extends javax.swing.JFrame {
     }
     private void configurarAccesos() {
         
-        if (nivelUsuario == 0) {  // Usuario normal
+        if (nivelUsuario == 1) {  // Usuario normal
             
             MUsuario.setEnabled(false);
             jMenuItem3.setEnabled(false);
@@ -255,15 +255,15 @@ public class Menu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        MSalas MS = new MSalas();
-        MS.setVisible(true);
-        this.dispose();
+        MSalas ms = new MSalas(this);  // le pasas el menú actual
+        ms.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
-        MRActividades MRA = new MRActividades();
+        MRActividades MRA = new MRActividades(this);
         MRA.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
@@ -275,51 +275,51 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem20ActionPerformed
 
     private void MUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MUsuarioActionPerformed
-        MUsuario MU = new MUsuario();
+        MUsuario MU = new MUsuario(this);
         MU.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_MUsuarioActionPerformed
 
     private void MEntrenadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MEntrenadorActionPerformed
-        MEntrenador ME = new MEntrenador();
+        MEntrenador ME = new MEntrenador(this);
         ME.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_MEntrenadorActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-        MLocalizacion ML = new MLocalizacion();
+        MLocalizacion ML = new MLocalizacion(this);
         ML.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
-        MActividades MA = new MActividades();
+        MActividades MA = new MActividades(this);
         MA.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        MHActividades MHA = new MHActividades();
+        MHActividades MHA = new MHActividades(this);
         MHA.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
-        MCliente MC = new MCliente();
+        MCliente MC = new MCliente(this);
         MC.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
-        MEReserva MER = new MEReserva();
+        MEReserva MER = new MEReserva(this);
         MER.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
-        MReservas MR = new MReservas();
+        MReservas MR = new MReservas(this);
         MR.setVisible(true);
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed

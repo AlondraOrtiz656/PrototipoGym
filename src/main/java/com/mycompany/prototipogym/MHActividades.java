@@ -18,14 +18,18 @@ import javax.swing.JOptionPane;
  */
 public class MHActividades extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/horario_act.txt";
+    private Menu menuOriginal;
+
 
     /**
      * Creates new form MHActividades
      */
-    public MHActividades() {
+    public MHActividades(Menu menu) {
         initComponents();
         setTitle("Mantenimiento de Horario de Actividades");
         setLocationRelativeTo(null);
+        this.menuOriginal = menu;
+
 
     }
     
@@ -158,7 +162,6 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "Error al guardar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     limpiarCampos();
-    txtMUAccion.setText("");
 }
 
 
@@ -171,12 +174,12 @@ private void guardarDatos() {
         txtMUAccion.setText("");
     }
     
-    Menu m = new Menu();
     
     private void cancelar() {
-        dispose();
-        m.setVisible(true);
-        txtMUAccion.setText("");
+        this.dispose();  // cierras MSalas
+        if (menuOriginal != null) {
+        menuOriginal.setVisible(true);  // vuelves al menú anterior
+    }
     }
 
     /**
@@ -411,7 +414,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MHActividades().setVisible(true);
+                //new MHActividades().setVisible(true);
             }
         });
     }

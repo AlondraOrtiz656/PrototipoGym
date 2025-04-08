@@ -13,6 +13,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,14 +24,18 @@ import javax.swing.JOptionPane;
  */
 public class MCliente extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/cliente.txt";
+    private Menu menuOriginal;
+
 
     /**
      * Creates new form MUsuario
      */
-    public MCliente() {
+    public MCliente(Menu menu) {
         initComponents();
         setTitle("Mantenimiento de Cliente");
         setLocationRelativeTo(null);
+        this.menuOriginal = menu;
+
 
     }
     
@@ -62,10 +69,24 @@ private void cargarUsuario() {
                 txtMCapellidop.setText(datos[2]);
                 txtMCapellidom.setText(datos[3]);
                 jtaMCdirrec.setText(datos[4]);
-                txtMCfechanac.setText(datos[5]);
+                String fechaStringNac = datos[5]; // Fecha de nacimiento
+                String fechaStringIng = datos[8]; // Fecha de ingreso
+
+                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
+
+                try {
+                    // Parsear la fecha de nacimiento
+                    Date fechaNac = sdf.parse(fechaStringNac);
+                    fechanacChooser.setDate(fechaNac);  // Asigna la fecha al JDateChooser de nacimiento
+
+                    // Parsear la fecha de ingreso
+                    Date fechaIng = sdf.parse(fechaStringIng);
+                    fechaingreChooser.setDate(fechaIng);  // Asigna la fecha al JDateChooser de ingreso
+                } catch (ParseException e) {
+                    JOptionPane.showMessageDialog(this, "Error al parsear la fecha. Verifica el formato (ej. '9 abr 2025').", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 txtMCtele.setText(datos[6]);
                 txtMCcelular.setText(datos[7]);
-                txtMCfechaingreso.setText(datos[8]);
                 cmbMCstatus.setSelectedItem(datos[9]);
                 txtMCtipocliente.setText(datos[10]);
                 txtMCcorreo.setText(datos[11]);
@@ -89,10 +110,10 @@ private void cargarUsuario() {
         txtMCapellidop.setText("");
         txtMCapellidom.setText("");
         jtaMCdirrec.setText("");
-        txtMCfechanac.setText("");
+        fechanacChooser.setDate(null);
         txtMCtele.setText("");
         txtMCcelular.setText("");
-        txtMCfechaingreso.setText("");
+        fechaingreChooser.setDate(null);
         cmbMCstatus.setSelectedIndex(0);
         txtMCtipocliente.setText("");
         txtMCcorreo.setText("");
@@ -111,10 +132,11 @@ private void cargarUsuario() {
             !txtMCapellidop.getText().trim().isEmpty() &&
             !txtMCapellidom.getText().trim().isEmpty() &&
             !jtaMCdirrec.getText().trim().isEmpty() &&
-            !txtMCfechanac.getText().trim().isEmpty() &&
+            fechanacChooser.getDate() != null &&
             !txtMCtele.getText().trim().isEmpty() &&
             !txtMCcelular.getText().trim().isEmpty() &&
-            !txtMCfechaingreso.getText().trim().isEmpty() &&
+            fechaingreChooser.getDate() != null &&
+            !txtMCvalorcuota.getText().trim().isEmpty() &&
             !txtMCtipocliente.getText().trim().isEmpty();
     }
     
@@ -137,18 +159,6 @@ private void guardarDatos() {
     String apellidop = txtMCapellidop.getText();
     String apellidom = txtMCapellidom.getText();
     String dirrecion = jtaMCdirrec.getText().replace("\n", " ").replace(",", "");
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    LocalDate fechanac, fechaingre;
-
-    try {
-        fechanac = LocalDate.parse(txtMCfechanac.getText(), formatter);
-        fechaingre = LocalDate.parse(txtMCfechaingreso.getText(), formatter);
-    } catch (DateTimeParseException e) {
-        JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use dd-MM-yyyy (ej: 05-04-2025).", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
     String telefono = txtMCtele.getText();
     String celular = txtMCcelular.getText();
     String status = String.valueOf(cmbMCstatus.getSelectedItem());
@@ -181,9 +191,21 @@ private void guardarDatos() {
     txtMCbalance.setText(String.valueOf(balance));
     txtMCvalorcuota.setText(String.valueOf(cuota));
 
+        // Obtener las fechas desde los JDateChooser
+    Date fechaNacDate = fechanacChooser.getDate();
+    Date fechaIngDate = fechaingreChooser.getDate();
+
+    // Formatear las fechas a cadena con el formato "d MMM yyyy"
+    SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES"));
+
+    String fechaNacString = sdfOutput.format(fechaNacDate);
+    String fechaIngString = sdfOutput.format(fechaIngDate);
+
+    // Incluir las fechas en el string para guardar en el archivo
     String nuevaLinea = id_cliente + "," + nombre + "," + apellidop + "," + apellidom + "," + dirrecion + "," +
-            fechanac.format(formatter) + "," + telefono + "," + celular + "," + fechaingre.format(formatter) + "," +
+            fechaNacString + "," + telefono + "," + celular + "," + fechaIngString + "," +
             status + "," + tipocliente + "," + correo + "," + balance + "," + cuota;
+
 
     File archivo = new File(FILE_PATH);
     boolean clienteExiste = false;
@@ -227,10 +249,10 @@ private void guardarDatos() {
         txtMCapellidop.setText("");
         txtMCapellidom.setText("");
         jtaMCdirrec.setText("");
-        txtMCfechanac.setText("");
+        fechanacChooser.setDate(null);
         txtMCtele.setText("");
         txtMCcelular.setText("");
-        txtMCfechaingreso.setText("");
+        fechaingreChooser.setDate(null);
         cmbMCstatus.setSelectedIndex(0);
         txtMCtipocliente.setText("");
         txtMCcorreo.setText("");
@@ -240,12 +262,12 @@ private void guardarDatos() {
         
     }
     
-    Menu m = new Menu();
     
     private void cancelar() {
-        dispose();
-        m.setVisible(true);
-        txtMUAccion.setText("");
+        this.dispose();  // cierras MSalas
+        if (menuOriginal != null) {
+        menuOriginal.setVisible(true);  // vuelves al menú anterior
+    }
     }
 
     /**
@@ -266,7 +288,6 @@ private void guardarDatos() {
         txtMCapellidom = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        txtMCfechanac = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jBCancelar = new javax.swing.JButton();
         jBLimpiar = new javax.swing.JButton();
@@ -274,7 +295,6 @@ private void guardarDatos() {
         txtMUAccion = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        txtMCfechaingreso = new javax.swing.JTextField();
         txtMCcelular = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -292,6 +312,8 @@ private void guardarDatos() {
         txtMCtele = new javax.swing.JTextField();
         cmbMCstatus = new javax.swing.JComboBox<>();
         txtMCtipocliente = new javax.swing.JTextField();
+        fechanacChooser = new com.toedter.calendar.JDateChooser();
+        fechaingreChooser = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -315,8 +337,6 @@ private void guardarDatos() {
         jLabel5.setText("Apellido Materno:");
 
         jLabel6.setText("Dirección:");
-
-        txtMCfechanac.setColumns(12);
 
         jLabel7.setText("Fecha de Nacimiento:");
 
@@ -352,8 +372,6 @@ private void guardarDatos() {
         jLabel8.setText("Status:");
 
         jLabel9.setText("Fecha Ingreso:");
-
-        txtMCfechaingreso.setColumns(12);
 
         txtMCcelular.setColumns(12);
 
@@ -438,48 +456,40 @@ private void guardarDatos() {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtMCapellidop, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(txtMCfechanac)
                                 .addComponent(txtMCapellidom)
                                 .addComponent(txtMCid)
                                 .addComponent(txtMCnom, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtMCtele, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fechanacChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel9)
-                                        .addComponent(jLabel8))
-                                    .addGap(234, 234, 234))
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addComponent(jLabel8)
+                                .addComponent(jLabel14)
+                                .addComponent(jLabel13)
+                                .addComponent(jLabel12)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel15)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(txtMCtipocliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addGap(164, 164, 164)
-                                        .addComponent(txtMCfechaingreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel14)
-                                        .addComponent(jLabel13)
-                                        .addComponent(jLabel12)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                                .addComponent(jLabel15)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(txtMCtipocliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                                .addGap(164, 164, 164)
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(txtMCvalorcuota)
-                                                        .addComponent(txtMCbalance)
-                                                        .addComponent(txtMCcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                    .addComponent(cmbMCstatus, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(txtMCvalorcuota)
+                                                .addComponent(txtMCbalance)
+                                                .addComponent(txtMCcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(cmbMCstatus, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel10)
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addGap(164, 164, 164)
-                                    .addComponent(txtMCcelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel10)
-                                    .addGap(195, 195, 195)))))
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(fechaingreChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtMCcelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel1)
@@ -523,14 +533,17 @@ private void guardarDatos() {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(txtMCfechanac, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jLabel7))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(fechanacChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtMCfechaingreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel9))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel9)
+                            .addComponent(fechaingreChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8)
@@ -640,13 +653,15 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MCliente().setVisible(true);
+               // new MCliente().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cmbMCstatus;
+    private com.toedter.calendar.JDateChooser fechaingreChooser;
+    private com.toedter.calendar.JDateChooser fechanacChooser;
     private javax.swing.JButton jBCancelar;
     private javax.swing.JButton jBGuardar;
     private javax.swing.JButton jBLimpiar;
@@ -673,8 +688,6 @@ private void guardarDatos() {
     private javax.swing.JTextField txtMCbalance;
     private javax.swing.JTextField txtMCcelular;
     private javax.swing.JTextField txtMCcorreo;
-    private javax.swing.JTextField txtMCfechaingreso;
-    private javax.swing.JTextField txtMCfechanac;
     private javax.swing.JTextField txtMCid;
     private javax.swing.JTextField txtMCnom;
     private javax.swing.JTextField txtMCtele;

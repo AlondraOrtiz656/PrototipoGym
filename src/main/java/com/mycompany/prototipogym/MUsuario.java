@@ -18,14 +18,17 @@ import javax.swing.JOptionPane;
  */
 public class MUsuario extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/usuarios.txt";
+    private Menu menuOriginal;
+
 
     /**
      * Creates new form MUsuario
      */
-    public MUsuario() {
+    public MUsuario(Menu menu) {
         initComponents();
         setTitle("Mantenimiento de Usuario");
         setLocationRelativeTo(null);
+        this.menuOriginal = menu;
 
     }
     
@@ -54,12 +57,10 @@ public class MUsuario extends javax.swing.JFrame {
                 // Ajusta el índice del combo según la información del archivo:
                 // En este ejemplo, si el valor en el archivo es "1" se asocia a "1 Normal" (índice 0),
                 // y si es "0" se asocia a "0 Administrador" (índice 1)
-                if(datos[2].equals("0")){
-                    cmbMUnivel.setSelectedIndex(0);
-                    
-                } else if(datos[2].equals("1")){
-                    cmbMUnivel.setSelectedIndex(1);
-                    
+                if (datos[2].equals("1")) {
+                    cmbMUnivel.setSelectedIndex(0); // 1 Normal
+                } else if (datos[2].equals("0")) {
+                    cmbMUnivel.setSelectedIndex(1); // 0 Administrador
                 }
                 txtMUnom.setText(datos[3]);
                 txtMUApellido.setText(datos[4]);
@@ -93,10 +94,7 @@ public class MUsuario extends javax.swing.JFrame {
                !txtMUApellido.getText().trim().isEmpty();
     }
     
-    private boolean esAdministrador() {
-        return cmbMUnivel.getSelectedIndex() == 1; 
-    }
-    
+        
 private void guardarDatos() {
     if (!validarCampos()) {
         JOptionPane.showMessageDialog(this, "Todos los campos excepto correo son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -105,7 +103,7 @@ private void guardarDatos() {
 
     String usuario = txtMUusuario.getText();
     String contrasena = txtMUpwd.getText();
-    String nivel = String.valueOf(cmbMUnivel.getSelectedIndex());
+    int nivel = cmbMUnivel.getSelectedIndex() == 0 ? 1 : 0;
     String nombre = txtMUnom.getText();
     String apellido = txtMUApellido.getText();
     String correo = txtMUCorreo.getText();
@@ -158,11 +156,12 @@ private void guardarDatos() {
         txtMUAccion.setText("");
     }
     
-    Menu m = new Menu();
     
     private void cancelar() {
-        dispose();
-        m.setVisible(true);
+        this.dispose();  // cierras MSalas
+        if (menuOriginal != null) {
+        menuOriginal.setVisible(true);  // vuelves al menú anterior
+    }
     }
 
     /**
@@ -416,7 +415,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MUsuario().setVisible(true);
+               // new MUsuario().setVisible(true);
             }
         });
     }

@@ -23,7 +23,7 @@ public void validarUsuario(String[] usuarios, String user, String pwd, int inten
         String[] credenciales = usuarios[i].split(",");
         if (credenciales.length >= 3 && credenciales[0].equals(user) && credenciales[1].equals(pwd)) {
             try {
-                int nivelUsuario = Integer.parseInt(credenciales[2]);
+                int nivelUsuario = Integer.parseInt(credenciales[2]);                
                 JOptionPane.showMessageDialog(null, "Bienvenido " + user, "Inicio de sesión", JOptionPane.INFORMATION_MESSAGE);
                 login.setIntentos(0);
                 Menu m = new Menu(nivelUsuario);

@@ -1,3 +1,3 @@
-alondra,1234,1,Alondra ,Ortiz ,
-juan,juan,0,juan,juan,juan@gmail.com
-admin,admin,1,Alondra,Ortiz,alondraortiz656@gmail.com
+alondra,1234,0,Alondra ,Ortiz ,
+juan,juan,1,juan,juan,juan@gmail.com
+admin,admin,0,Alondra,Ortiz,alondraortiz656@gmail.com
