@@ -4,9 +4,7 @@
  */
 package com.mycompany.prototipogym;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -77,18 +75,28 @@ private void cargarUsuario() {
                 try {
                     // Parsear la fecha de nacimiento
                     Date fechaNac = sdf.parse(fechaStringNac);
-                    fechanacChooser.setDate(fechaNac);  // Asigna la fecha al JDateChooser de nacimiento
+                    fechanacChooser.setDate(fechaNac);  
 
                     // Parsear la fecha de ingreso
                     Date fechaIng = sdf.parse(fechaStringIng);
-                    fechaingreChooser.setDate(fechaIng);  // Asigna la fecha al JDateChooser de ingreso
+                    fechaingreChooser.setDate(fechaIng);  
                 } catch (ParseException e) {
                     JOptionPane.showMessageDialog(this, "Error al parsear la fecha. Verifica el formato (ej. '9 abr 2025').", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 txtMCtele.setText(datos[6]);
                 txtMCcelular.setText(datos[7]);
                 cmbMCstatus.setSelectedItem(datos[9]);
-                txtMCtipocliente.setText(datos[10]);
+                int tipoCliente = Integer.parseInt(datos[10]); //  datos[10] es el tipo de cliente (1 o 2)
+
+                if (tipoCliente == 1) {
+                    rbtnSocio.setSelected(true);
+                } else if (tipoCliente == 2) {
+                    rbtnInvitado.setSelected(true);
+                } else {
+                    rbtnSocio.setSelected(false);
+                    rbtnInvitado.setSelected(false);
+                    JOptionPane.showMessageDialog(this, "Tipo de cliente desconocido.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
                 txtMCcorreo.setText(datos[11]);
                 txtMCbalance.setText(datos[12]);
                 txtMCvalorcuota.setText(datos[13]);
@@ -113,10 +121,10 @@ private void cargarUsuario() {
         fechanacChooser.setDate(null);
         txtMCtele.setText("");
         txtMCcelular.setText("");
-        fechaingreChooser.setDate(null);
+        fechaingreChooser.setDate(new Date());
         cmbMCstatus.setSelectedIndex(0);
-        txtMCtipocliente.setText("");
         txtMCcorreo.setText("");
+        buttonGroup1.clearSelection();
         txtMCbalance.setText("");
         txtMCvalorcuota.setText("");
         txtMUAccion.setText("Creando");
@@ -125,20 +133,25 @@ private void cargarUsuario() {
     
 
     
-    private boolean validarCampos() {
-        return  
-            !txtMCid.getText().trim().isEmpty() &&
-            !txtMCnom.getText().trim().isEmpty() &&
-            !txtMCapellidop.getText().trim().isEmpty() &&
-            !txtMCapellidom.getText().trim().isEmpty() &&
-            !jtaMCdirrec.getText().trim().isEmpty() &&
-            fechanacChooser.getDate() != null &&
-            !txtMCtele.getText().trim().isEmpty() &&
-            !txtMCcelular.getText().trim().isEmpty() &&
-            fechaingreChooser.getDate() != null &&
-            !txtMCvalorcuota.getText().trim().isEmpty() &&
-            !txtMCtipocliente.getText().trim().isEmpty();
+private boolean validarCampos() {
+    if (!rbtnSocio.isSelected() && !rbtnInvitado.isSelected()) {
+        JOptionPane.showMessageDialog(this, "Debe seleccionar un tipo de cliente.", "Validación", JOptionPane.WARNING_MESSAGE);
+        return false;
     }
+
+    return  
+        !txtMCid.getText().trim().isEmpty() &&
+        !txtMCnom.getText().trim().isEmpty() &&
+        !txtMCapellidop.getText().trim().isEmpty() &&
+        !txtMCapellidom.getText().trim().isEmpty() &&
+        !jtaMCdirrec.getText().trim().isEmpty() &&
+        fechanacChooser.getDate() != null &&
+        !txtMCtele.getText().trim().isEmpty() &&
+        !txtMCcelular.getText().trim().isEmpty() &&
+        fechaingreChooser.getDate() != null &&
+        !txtMCvalorcuota.getText().trim().isEmpty();
+}
+
     
         
 private void guardarDatos() {
@@ -164,12 +177,18 @@ private void guardarDatos() {
     String status = String.valueOf(cmbMCstatus.getSelectedItem());
 
     int tipocliente;
-    try {
-        tipocliente = Integer.parseInt(txtMCtipocliente.getText());
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Tipo de cliente inválido. Debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+    if (rbtnSocio.isSelected()) {
+        tipocliente = 1; // Socio
+    } else if (rbtnInvitado.isSelected()) {
+        tipocliente = 2; // Invitado
+    } else {
+        JOptionPane.showMessageDialog(this, "Seleccione el tipo de cliente (Socio o Invitado).", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
+    if (status.equalsIgnoreCase("Activo") && tipocliente != 1) {
+    JOptionPane.showMessageDialog(this, "Solo los clientes tipo Socio pueden tener estado Activo.", "Error", JOptionPane.ERROR_MESSAGE);
+    return;
+}
 
     String correo = txtMCcorreo.getText();
 
@@ -254,9 +273,9 @@ private void guardarDatos() {
         txtMCcelular.setText("");
         fechaingreChooser.setDate(null);
         cmbMCstatus.setSelectedIndex(0);
-        txtMCtipocliente.setText("");
         txtMCcorreo.setText("");
         txtMCbalance.setText("");
+        buttonGroup1.clearSelection();
         txtMCvalorcuota.setText("");
         txtMUAccion.setText("");
         
@@ -279,6 +298,7 @@ private void guardarDatos() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -311,9 +331,10 @@ private void guardarDatos() {
         jtaMCdirrec = new javax.swing.JTextArea();
         txtMCtele = new javax.swing.JTextField();
         cmbMCstatus = new javax.swing.JComboBox<>();
-        txtMCtipocliente = new javax.swing.JTextField();
         fechanacChooser = new com.toedter.calendar.JDateChooser();
         fechaingreChooser = new com.toedter.calendar.JDateChooser();
+        rbtnSocio = new javax.swing.JRadioButton();
+        rbtnInvitado = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -410,17 +431,26 @@ private void guardarDatos() {
 
         txtMCtele.setColumns(12);
 
-        cmbMCstatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Activo", "Inactivo" }));
+        cmbMCstatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Activo", "Pasivo" }));
         cmbMCstatus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbMCstatusActionPerformed(evt);
             }
         });
 
-        txtMCtipocliente.setColumns(12);
-        txtMCtipocliente.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(rbtnSocio);
+        rbtnSocio.setText("Socio Activo");
+        rbtnSocio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMCtipoclienteActionPerformed(evt);
+                rbtnSocioActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(rbtnInvitado);
+        rbtnInvitado.setText("Invitado");
+        rbtnInvitado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnInvitadoActionPerformed(evt);
             }
         });
 
@@ -429,7 +459,7 @@ private void guardarDatos() {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(135, 676, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(txtMUAccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(25, 25, 25))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -462,34 +492,37 @@ private void guardarDatos() {
                                 .addComponent(txtMCtele, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(fechanacChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel9)
-                                .addComponent(jLabel8)
-                                .addComponent(jLabel14)
-                                .addComponent(jLabel13)
-                                .addComponent(jLabel12)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel15)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(txtMCtipocliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                        .addGap(164, 164, 164)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                .addComponent(txtMCvalorcuota)
-                                                .addComponent(txtMCbalance)
-                                                .addComponent(txtMCcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addComponent(cmbMCstatus, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel10)
                                 .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGap(164, 164, 164)
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(fechaingreChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtMCcelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                        .addComponent(jLabel15)
+                                        .addComponent(jLabel8))
+                                    .addGap(235, 235, 235))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel10)
+                                    .addGap(270, 270, 270)))
+                            .addComponent(jLabel14)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel12)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(164, 164, 164)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(rbtnSocio, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(txtMCvalorcuota, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtMCbalance, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtMCcorreo)
+                                        .addComponent(rbtnInvitado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(cmbMCstatus, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtMCcelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(fechaingreChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(16, 16, 16))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel1)
@@ -506,14 +539,18 @@ private void guardarDatos() {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addComponent(jLabel1)))
-                .addGap(41, 41, 41)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtMCid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtMCcelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10))
-                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(41, 41, 41)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtMCid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtMCcelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
@@ -539,20 +576,26 @@ private void guardarDatos() {
                                 .addComponent(jLabel7))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
-                                .addComponent(fechanacChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(fechanacChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(28, 28, 28)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(txtMCtele, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel9)
                             .addComponent(fechaingreChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel8)
                             .addComponent(cmbMCstatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                        .addGap(21, 21, 21)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel15)
-                            .addComponent(txtMCtipocliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(21, 21, 21)
+                            .addComponent(rbtnSocio))
+                        .addGap(18, 18, 18)
+                        .addComponent(rbtnInvitado)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtMCcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel14))
@@ -564,11 +607,7 @@ private void guardarDatos() {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtMCvalorcuota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel12))))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
-                    .addComponent(txtMCtele, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBCancelar)
                     .addComponent(jBLimpiar)
@@ -614,13 +653,17 @@ private void guardarDatos() {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtMCapellidopActionPerformed
 
-    private void txtMCtipoclienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMCtipoclienteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtMCtipoclienteActionPerformed
-
     private void cmbMCstatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMCstatusActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbMCstatusActionPerformed
+
+    private void rbtnSocioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnSocioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rbtnSocioActionPerformed
+
+    private void rbtnInvitadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnInvitadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rbtnInvitadoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -659,6 +702,7 @@ private void guardarDatos() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cmbMCstatus;
     private com.toedter.calendar.JDateChooser fechaingreChooser;
     private com.toedter.calendar.JDateChooser fechanacChooser;
@@ -683,6 +727,8 @@ private void guardarDatos() {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jtaMCdirrec;
+    private javax.swing.JRadioButton rbtnInvitado;
+    private javax.swing.JRadioButton rbtnSocio;
     private javax.swing.JTextField txtMCapellidom;
     private javax.swing.JTextField txtMCapellidop;
     private javax.swing.JTextField txtMCbalance;
@@ -691,7 +737,6 @@ private void guardarDatos() {
     private javax.swing.JTextField txtMCid;
     private javax.swing.JTextField txtMCnom;
     private javax.swing.JTextField txtMCtele;
-    private javax.swing.JTextField txtMCtipocliente;
     private javax.swing.JTextField txtMCvalorcuota;
     private javax.swing.JTextField txtMUAccion;
     // End of variables declaration//GEN-END:variables

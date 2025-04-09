@@ -12,15 +12,15 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author asist-depti
  */
-public class CUsuarios extends javax.swing.JFrame {
+public class CClientes extends javax.swing.JFrame {
 
-    private static final String FILE_PATH = "archivos/usuarios.txt";
+    private static final String FILE_PATH = "archivos/cliente.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
     private Menu menuOriginal;
 
-    public CUsuarios(Menu menu) {
+    public CClientes(Menu menu) {
         initComponents();
-        setTitle("Consulta de Usuarios");
+        setTitle("Consulta de Clientes");
         setLocationRelativeTo(null);
         this.menuOriginal = menu;
         cargarUsuarios();
@@ -36,20 +36,29 @@ public class CUsuarios extends javax.swing.JFrame {
         while ((linea = br.readLine()) != null) {
             // Se usa split(",", -1) para incluir campos vacíos al final
             String[] datos = linea.split(",", -1);
-            if (datos.length >= 6) {
+            if (datos.length >= 14) {
                 String[] fila = new String[] {
-                    datos[0].trim(), // usuario
-                    datos[2].trim().equals("0") ? "Admin" : "Normal", // acceso
-                    datos[3].trim(), // nombre
-                    datos[4].trim(), // apellido
-                    datos[5].trim()  // correo
+                    datos[0].trim(), // ID
+                    datos[1].trim(), // nombre
+                    datos[2].trim(), // apellido p
+                    datos[3].trim(), // apellido m
+                    datos[4].trim(), // Dirección
+                    datos[5].trim(), // fecha nac
+                    datos[6].trim(), // teléfono
+                    datos[7].trim(), // celular
+                    datos[8].trim(), // fecha ingreso
+                    datos[9].trim(), // status
+                    datos[10].trim().equals("1") ? "Socio" : "Invitado", // tipo
+                    datos[11].trim(), // correo
+                    datos[12].trim(), // balance
+                    datos[13].trim()  // cuota
                 };
                 modelo.addRow(fila);
                 listaUsuarios.add(fila);
             }
         }
     } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al leer el archivo de usuarios: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo de clientes: " + e.getMessage());
     }
 }
 
@@ -72,6 +81,7 @@ public class CUsuarios extends javax.swing.JFrame {
         menuOriginal.setVisible(true);  
     }
     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -93,24 +103,24 @@ public class CUsuarios extends javax.swing.JFrame {
 
         CUTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Usuario", "Acceso", "Nombre", "Apellido", "Correo"
+                "ID", "Nombre", "Apellido Paterno", "Apellido Materno", "Dirección", "Fecha de Nacimiento", "Teléfono", "Celular", "Fecha Ingreso", "Status", "Tipo", "Correo", "Balance", "Cuota"
             }
         ));
         jScrollPane1.setViewportView(CUTable);
 
-        jLabel1.setText("Consulta de Usuario");
+        jLabel1.setText("Consulta de Clientes");
 
         jLabel2.setText("Filtrar por:");
 
-        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Usuario", "Nivel de Acceso", "Nombre", "Apellido", "Correo" }));
+        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Nombre", "Apellido P", "Apellido M", "Dirección", "Fecha de Nacimiento", "Teléfono", "Celular", "Fecha Ingreso", "Ststus", "Tipo", "Correo", "Balance", "Cuota" }));
         cmbfiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbfiltroActionPerformed(evt);
@@ -138,20 +148,21 @@ public class CUsuarios extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(32, 32, 32)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(txtconsulta)))
+                                .addGap(344, 344, 344)
+                                .addComponent(jLabel1))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 869, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(txtconsulta)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
+                        .addGap(410, 410, 410)
                         .addComponent(btncancelar)))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,10 +176,10 @@ public class CUsuarios extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtconsulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btncancelar)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
@@ -203,20 +214,21 @@ public class CUsuarios extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CClientes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CClientes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CClientes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CClientes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new CUsuarios().setVisible(true);
+                //new CClientes().setVisible(true);
             }
         });
     }

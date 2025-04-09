@@ -12,15 +12,15 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author asist-depti
  */
-public class CUsuarios extends javax.swing.JFrame {
+public class CSalas extends javax.swing.JFrame {
 
-    private static final String FILE_PATH = "archivos/usuarios.txt";
+    private static final String FILE_PATH = "archivos/salas.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
     private Menu menuOriginal;
 
-    public CUsuarios(Menu menu) {
+    public CSalas(Menu menu) {
         initComponents();
-        setTitle("Consulta de Usuarios");
+        setTitle("Consulta de Salas");
         setLocationRelativeTo(null);
         this.menuOriginal = menu;
         cargarUsuarios();
@@ -36,20 +36,21 @@ public class CUsuarios extends javax.swing.JFrame {
         while ((linea = br.readLine()) != null) {
             // Se usa split(",", -1) para incluir campos vacíos al final
             String[] datos = linea.split(",", -1);
-            if (datos.length >= 6) {
+            if (datos.length >= 4) {
                 String[] fila = new String[] {
-                    datos[0].trim(), // usuario
-                    datos[2].trim().equals("0") ? "Admin" : "Normal", // acceso
-                    datos[3].trim(), // nombre
-                    datos[4].trim(), // apellido
-                    datos[5].trim()  // correo
+                    datos[0].trim(), // ID
+                    datos[1].trim(), // nombre
+                    datos[2].trim(), // descripción
+                    datos[3].trim(), // ID localización
+                    
+                    
                 };
                 modelo.addRow(fila);
                 listaUsuarios.add(fila);
             }
         }
     } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al leer el archivo de usuarios: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo de salas: " + e.getMessage());
     }
 }
 
@@ -66,6 +67,7 @@ public class CUsuarios extends javax.swing.JFrame {
             }
         }
     }
+    
     private void cancelar() {
         this.dispose();  
         if (menuOriginal != null) {
@@ -93,24 +95,24 @@ public class CUsuarios extends javax.swing.JFrame {
 
         CUTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Usuario", "Acceso", "Nombre", "Apellido", "Correo"
+                "ID", "Nombre", "Descripción", "ID Localización"
             }
         ));
         jScrollPane1.setViewportView(CUTable);
 
-        jLabel1.setText("Consulta de Usuario");
+        jLabel1.setText("Consulta de Salas");
 
         jLabel2.setText("Filtrar por:");
 
-        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Usuario", "Nivel de Acceso", "Nombre", "Apellido", "Correo" }));
+        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Nombre", "Descripción", "Id Localización" }));
         cmbfiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbfiltroActionPerformed(evt);
@@ -149,7 +151,7 @@ public class CUsuarios extends javax.swing.JFrame {
                         .addGap(207, 207, 207)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
+                        .addGap(213, 213, 213)
                         .addComponent(btncancelar)))
                 .addContainerGap(45, Short.MAX_VALUE))
         );
@@ -168,7 +170,7 @@ public class CUsuarios extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btncancelar)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pack();
@@ -203,20 +205,21 @@ public class CUsuarios extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CSalas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CSalas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CSalas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CSalas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new CUsuarios().setVisible(true);
+                //new CSalas().setVisible(true);
             }
         });
     }

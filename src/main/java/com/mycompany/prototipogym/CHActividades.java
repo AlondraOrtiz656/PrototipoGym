@@ -12,15 +12,15 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author asist-depti
  */
-public class CUsuarios extends javax.swing.JFrame {
+public class CHActividades extends javax.swing.JFrame {
 
-    private static final String FILE_PATH = "archivos/usuarios.txt";
+    private static final String FILE_PATH = "archivos/horario_act.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
     private Menu menuOriginal;
 
-    public CUsuarios(Menu menu) {
+    public CHActividades(Menu menu) {
         initComponents();
-        setTitle("Consulta de Usuarios");
+        setTitle("Consulta de Horarios de Actividades");
         setLocationRelativeTo(null);
         this.menuOriginal = menu;
         cargarUsuarios();
@@ -36,20 +36,19 @@ public class CUsuarios extends javax.swing.JFrame {
         while ((linea = br.readLine()) != null) {
             // Se usa split(",", -1) para incluir campos vacíos al final
             String[] datos = linea.split(",", -1);
-            if (datos.length >= 6) {
+            if (datos.length >= 4) {
                 String[] fila = new String[] {
-                    datos[0].trim(), // usuario
-                    datos[2].trim().equals("0") ? "Admin" : "Normal", // acceso
-                    datos[3].trim(), // nombre
-                    datos[4].trim(), // apellido
-                    datos[5].trim()  // correo
+                    datos[0].trim(), // ID
+                    datos[1].trim(), // Día
+                    datos[2].trim(), // Hora
+                    datos[3].trim()  // ID Actvidad
                 };
                 modelo.addRow(fila);
                 listaUsuarios.add(fila);
             }
         }
     } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al leer el archivo de usuarios: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo de horario de actividades: " + e.getMessage());
     }
 }
 
@@ -66,12 +65,14 @@ public class CUsuarios extends javax.swing.JFrame {
             }
         }
     }
+    
     private void cancelar() {
         this.dispose();  
         if (menuOriginal != null) {
         menuOriginal.setVisible(true);  
     }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -93,24 +94,24 @@ public class CUsuarios extends javax.swing.JFrame {
 
         CUTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Usuario", "Acceso", "Nombre", "Apellido", "Correo"
+                "ID", "Día", "Hora", "ID Actividad"
             }
         ));
         jScrollPane1.setViewportView(CUTable);
 
-        jLabel1.setText("Consulta de Usuario");
+        jLabel1.setText("Consulta de Horarios de Actvidades");
 
         jLabel2.setText("Filtrar por:");
 
-        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Usuario", "Nivel de Acceso", "Nombre", "Apellido", "Correo" }));
+        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Día", "Hora", "ID Actividad" }));
         cmbfiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbfiltroActionPerformed(evt);
@@ -146,10 +147,10 @@ public class CUsuarios extends javax.swing.JFrame {
                                 .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(txtconsulta)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
+                        .addGap(168, 168, 168)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
+                        .addGap(205, 205, 205)
                         .addComponent(btncancelar)))
                 .addContainerGap(45, Short.MAX_VALUE))
         );
@@ -203,20 +204,21 @@ public class CUsuarios extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CHActividades.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CHActividades.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CHActividades.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CHActividades.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new CUsuarios().setVisible(true);
+                //new CHActividades().setVisible(true);
             }
         });
     }

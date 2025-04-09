@@ -42,7 +42,7 @@
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="207" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="219" max="-2" attributes="0"/>
                       <Component id="btncancelar" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -82,31 +82,13 @@
         <Component class="javax.swing.JTable" name="CUTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="5" rowCount="6">
-                <Column editable="true" title="Usuario" type="java.lang.Object"/>
-                <Column editable="true" title="Acceso" type="java.lang.Object"/>
-                <Column editable="true" title="Nombre" type="java.lang.Object"/>
-                <Column editable="true" title="Apellido" type="java.lang.Object"/>
-                <Column editable="true" title="Correo" type="java.lang.Object"/>
+              <Table columnCount="2" rowCount="6">
+                <Column editable="true" title="ID" type="java.lang.Object"/>
+                <Column editable="true" title="Tipos" type="java.lang.Object"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
               <TableColumnModel selectionModel="0">
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title/>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title/>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title/>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title/>
                   <Editor/>
@@ -128,7 +110,7 @@
     </Container>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Consulta de Usuario"/>
+        <Property name="text" type="java.lang.String" value="Consulta de Localizaci&#xf3;n"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
@@ -139,12 +121,9 @@
     <Component class="javax.swing.JComboBox" name="cmbfiltro">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="5">
-            <StringItem index="0" value="Usuario"/>
-            <StringItem index="1" value="Nivel de Acceso"/>
-            <StringItem index="2" value="Nombre"/>
-            <StringItem index="3" value="Apellido"/>
-            <StringItem index="4" value="Correo"/>
+          <StringArray count="2">
+            <StringItem index="0" value="ID"/>
+            <StringItem index="1" value="Tipos"/>
           </StringArray>
         </Property>
       </Properties>

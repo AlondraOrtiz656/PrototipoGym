@@ -12,52 +12,53 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author asist-depti
  */
-public class CUsuarios extends javax.swing.JFrame {
+public class CEntrenador extends javax.swing.JFrame {
 
-    private static final String FILE_PATH = "archivos/usuarios.txt";
+    private static final String FILE_PATH = "archivos/entrenador.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
     private Menu menuOriginal;
 
-    public CUsuarios(Menu menu) {
+
+    public CEntrenador(Menu menu) {
         initComponents();
-        setTitle("Consulta de Usuarios");
+        setTitle("Consulta de Entrenador");
         setLocationRelativeTo(null);
         this.menuOriginal = menu;
         cargarUsuarios();
     }
 
     private void cargarUsuarios() {
-    DefaultTableModel modelo = (DefaultTableModel) CUTable.getModel();
-    modelo.setRowCount(0); // Limpiar tabla
-    listaUsuarios.clear(); // Limpiar lista
+        DefaultTableModel modelo = (DefaultTableModel) CETable.getModel();
+        modelo.setRowCount(0); // Limpiar tabla
+        listaUsuarios.clear(); // Limpiar lista
 
-    try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            // Se usa split(",", -1) para incluir campos vacíos al final
-            String[] datos = linea.split(",", -1);
-            if (datos.length >= 6) {
-                String[] fila = new String[] {
-                    datos[0].trim(), // usuario
-                    datos[2].trim().equals("0") ? "Admin" : "Normal", // acceso
-                    datos[3].trim(), // nombre
-                    datos[4].trim(), // apellido
-                    datos[5].trim()  // correo
-                };
-                modelo.addRow(fila);
-                listaUsuarios.add(fila);
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+
+                // Se usa split(",", -1) para incluir campos vacíos al final
+                String[] datos = linea.split(",", -1);
+                if (datos.length >= 5) {
+                    String[] fila = new String[]{
+                        datos[0].trim(), // ID
+                        datos[1].trim(), // nombre
+                        datos[2].trim(), // apellido
+                        datos[3].trim(), // teléfono
+                        datos[4].trim(), // correo
+                    };
+                    modelo.addRow(fila);
+                    listaUsuarios.add(fila);
+                }
             }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al leer el archivo de entrenador: " + e.getMessage());
         }
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al leer el archivo de usuarios: " + e.getMessage());
     }
-}
-
 
     private void filtrarTabla(String texto) {
         int columna = cmbfiltro.getSelectedIndex();
 
-        DefaultTableModel modelo = (DefaultTableModel) CUTable.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) CETable.getModel();
         modelo.setRowCount(0); // Limpiar tabla
 
         for (String[] fila : listaUsuarios) {
@@ -66,12 +67,14 @@ public class CUsuarios extends javax.swing.JFrame {
             }
         }
     }
+    
     private void cancelar() {
         this.dispose();  
         if (menuOriginal != null) {
         menuOriginal.setVisible(true);  
     }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -82,7 +85,7 @@ public class CUsuarios extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        CUTable = new javax.swing.JTable();
+        CETable = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         cmbfiltro = new javax.swing.JComboBox<>();
@@ -91,7 +94,7 @@ public class CUsuarios extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        CUTable.setModel(new javax.swing.table.DefaultTableModel(
+        CETable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -101,16 +104,16 @@ public class CUsuarios extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Usuario", "Acceso", "Nombre", "Apellido", "Correo"
+                "ID", "Nombre", "Apellido", "Teléfono", "Correo"
             }
         ));
-        jScrollPane1.setViewportView(CUTable);
+        jScrollPane1.setViewportView(CETable);
 
-        jLabel1.setText("Consulta de Usuario");
+        jLabel1.setText("Consulta de Entrenador");
 
         jLabel2.setText("Filtrar por:");
 
-        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Usuario", "Nivel de Acceso", "Nombre", "Apellido", "Correo" }));
+        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Nombre", "Apellido", "Teléfono", "Correo" }));
         cmbfiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbfiltroActionPerformed(evt);
@@ -146,10 +149,10 @@ public class CUsuarios extends javax.swing.JFrame {
                                 .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(txtconsulta)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
+                        .addGap(196, 196, 196)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
+                        .addGap(221, 221, 221)
                         .addComponent(btncancelar)))
                 .addContainerGap(45, Short.MAX_VALUE))
         );
@@ -168,7 +171,7 @@ public class CUsuarios extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btncancelar)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
@@ -203,26 +206,27 @@ public class CUsuarios extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CEntrenador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CEntrenador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CEntrenador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CEntrenador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new CUsuarios().setVisible(true);
+               // new CEntrenador().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable CUTable;
+    private javax.swing.JTable CETable;
     private javax.swing.JButton btncancelar;
     private javax.swing.JComboBox<String> cmbfiltro;
     private javax.swing.JLabel jLabel1;

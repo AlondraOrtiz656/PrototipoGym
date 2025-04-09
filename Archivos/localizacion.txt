@@ -1,2 +1,2 @@
-1234,tipos
-2121,Exterior
+1234,primer piso
+2121,segundo piso
