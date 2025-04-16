@@ -24,6 +24,7 @@ public class Menu extends javax.swing.JFrame {
         this.nivelUsuario = nivelUsuario;
         setTitle("Menú Principal");
         setLocationRelativeTo(null);
+        setExtendedState(MAXIMIZED_BOTH);
         configurarAccesos();
     }
     private void configurarAccesos() {
@@ -173,6 +174,11 @@ public class Menu extends javax.swing.JFrame {
         jMenu3.setText("Procesos");
 
         jMenuItem3.setText("Generar Cobro");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
         jMenu3.add(jMenuItem3);
 
         jMenuItem14.setText("Reversar Cobro");
@@ -287,13 +293,12 @@ public class Menu extends javax.swing.JFrame {
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
         MSalas ms = new MSalas(this);  // le pasas el menú actual
         ms.setVisible(true);
-        this.setVisible(false);
+        
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
         MRActividades MRA = new MRActividades(this);
         MRA.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
@@ -303,55 +308,46 @@ public class Menu extends javax.swing.JFrame {
     private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
         CHActividades CHA = new CHActividades(this);
         CHA.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem20ActionPerformed
 
     private void MUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MUsuarioActionPerformed
         MUsuario MU = new MUsuario(this);
         MU.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_MUsuarioActionPerformed
 
     private void MEntrenadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MEntrenadorActionPerformed
         MEntrenador ME = new MEntrenador(this);
         ME.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_MEntrenadorActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         MLocalizacion ML = new MLocalizacion(this);
         ML.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
         MActividades MA = new MActividades(this);
         MA.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
         MHActividades MHA = new MHActividades(this);
         MHA.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
         MCliente MC = new MCliente(this);
         MC.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         MEReserva MER = new MEReserva(this);
         MER.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
         MReservas MR = new MReservas(this);
         MR.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
@@ -361,38 +357,37 @@ public class Menu extends javax.swing.JFrame {
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         CUsuarios CU = new CUsuarios(this);
         CU.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem16ActionPerformed
         CEntrenador CE = new CEntrenador(this);
         CE.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem16ActionPerformed
 
     private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
         CLocalizacion CL = new CLocalizacion(this);
         CL.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem17ActionPerformed
 
     private void jMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem18ActionPerformed
         CSalas CS = new CSalas(this);
         CS.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem18ActionPerformed
 
     private void jMenuItem19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem19ActionPerformed
         CActividades CA = new CActividades(this);
         CA.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem19ActionPerformed
 
     private void jMenuItem25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem25ActionPerformed
         CClientes CC = new CClientes(this);
         CC.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_jMenuItem25ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        PCobro PC = new PCobro();
+        PC.setVisible(true);
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     /**
      * @param args the command line arguments

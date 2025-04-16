@@ -406,6 +406,7 @@ private void guardarDatos() {
 
         jLabel13.setText("Balance:");
 
+        txtMCbalance.setEditable(false);
         txtMCbalance.setColumns(12);
 
         txtMCcorreo.setColumns(12);
