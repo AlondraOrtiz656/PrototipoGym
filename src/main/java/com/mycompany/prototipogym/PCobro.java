@@ -143,6 +143,10 @@ public static class GeneradorCobros {
             return ultimo;
         }
     }
+    
+    private void cancelar() {
+        this.dispose();  
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -174,6 +178,11 @@ public static class GeneradorCobros {
         });
 
         btnVolver.setText("Volver");
+        btnVolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVolverActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -240,6 +249,10 @@ public static class GeneradorCobros {
             javax.swing.JOptionPane.showMessageDialog(null, "Error generando cobros: " + ex.getMessage());
         }
     }//GEN-LAST:event_btnGencobroActionPerformed
+
+    private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
+        cancelar();
+    }//GEN-LAST:event_btnVolverActionPerformed
 
     /**
      * @param args the command line arguments*/
