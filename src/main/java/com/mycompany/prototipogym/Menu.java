@@ -32,8 +32,7 @@ public class Menu extends javax.swing.JFrame {
         if (nivelUsuario == 1) {  // Usuario normal
             
             MUsuario.setEnabled(false);
-            jMenuItem3.setEnabled(false);
-            jMenuItem14.setEnabled(false);
+            jMenuItem3.setEnabled(false);            
         }
     }
     /**
