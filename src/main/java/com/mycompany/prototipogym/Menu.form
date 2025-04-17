@@ -183,11 +183,17 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="De Cobro por Rango de Fecha"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem21ActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem22">
               <Properties>
                 <Property name="text" type="java.lang.String" value="De Cobro por Cliente"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem22ActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem23">
               <Properties>
@@ -211,6 +217,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="De Clientes con Balance Pendiente"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem26ActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>

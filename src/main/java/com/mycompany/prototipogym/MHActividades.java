@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 /**
@@ -18,19 +21,15 @@ import javax.swing.JOptionPane;
  */
 public class MHActividades extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/horario_act.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MHActividades
      */
-    public MHActividades(Menu menu) {
+    public MHActividades() {
         initComponents();
-        setTitle("Mantenimiento de Horario de Actividades");
+        setTitle("Mantenimienlto de Horario de Actividades");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
-
     }
     
 
@@ -54,7 +53,16 @@ public class MHActividades extends javax.swing.JFrame {
                 if ((datos[0]).equals(id_horario_act)) {
                 idEncontrado = true;
                 // Se llenan los campos con la información obtenida:
-                txtMHAdia.setText(datos[1]);
+                String fecha_act = datos[1]; // Fecha de ingreso
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
+
+                try {
+                    Date fecha_actd = sdf.parse(fecha_act);
+                    dia_actChooser.setDate(fecha_actd);  
+                } catch (ParseException e) {
+                    JOptionPane.showMessageDialog(this, "Error al parsear la fecha. Verifica el formato (ej. '9 abr 2025').", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 txtMHAhora.setText(datos[2]);
                 txtMHA_IDact.setText(datos[3]);
                 txtMUAccion.setText("Modificando");
@@ -71,7 +79,7 @@ public class MHActividades extends javax.swing.JFrame {
     }
 
     if (!idEncontrado) {
-        txtMHAdia.setText("");
+        dia_actChooser.setDate(null);
         txtMHAhora.setText("");
         txtMHA_IDact.setText("");
         txtMUAccion.setText("Creando");
@@ -98,7 +106,7 @@ public class MHActividades extends javax.swing.JFrame {
   
     private boolean validarCampos() {
         return !txtMHAid.getText().trim().isEmpty() &&
-               !txtMHAdia.getText().trim().isEmpty() &&
+               dia_actChooser.getDate() != null &&
                !txtMHAhora.getText().trim().isEmpty() &&
                !txtMHA_IDact.getText().trim().isEmpty();
     }
@@ -120,7 +128,9 @@ private void guardarDatos() {
         return;
     }
 
-    String dia = txtMHAdia.getText().trim();
+    SimpleDateFormat sdfOutput = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES"));
+
+    String fecha_act = sdfOutput.format(dia_actChooser.getDate());
 
     // Verificar si el ID de Actividad existe
     if (!existeIdActividad(id_act)) {
@@ -128,7 +138,7 @@ private void guardarDatos() {
         return;
     }
 
-    String nuevaLinea = id_horarioact + "," + dia + "," + hora + "," + id_act;
+    String nuevaLinea = id_horarioact + "," + fecha_act + "," + hora + "," + id_act;
     File archivo = new File(FILE_PATH);
     boolean HorarioActExiste = false;
     StringBuilder contenido = new StringBuilder();
@@ -168,7 +178,7 @@ private void guardarDatos() {
     
     private void limpiarCampos() {
         txtMHAid.setText("");
-        txtMHAdia.setText("");
+        dia_actChooser.setDate(null);
         txtMHAhora.setText("");
         txtMHA_IDact.setText("");        
         txtMUAccion.setText("");
@@ -177,9 +187,6 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
     }
 
     /**
@@ -197,7 +204,6 @@ private void guardarDatos() {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtMHAid = new javax.swing.JTextField();
-        txtMHAdia = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jBCancelar = new javax.swing.JButton();
@@ -207,6 +213,7 @@ private void guardarDatos() {
         jLabel3 = new javax.swing.JLabel();
         txtMHA_IDact = new javax.swing.JTextField();
         txtMHAhora = new javax.swing.JTextField();
+        dia_actChooser = new com.toedter.calendar.JDateChooser();
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -224,8 +231,6 @@ private void guardarDatos() {
                 txtMHAidActionPerformed(evt);
             }
         });
-
-        txtMHAdia.setColumns(12);
 
         jLabel5.setText("Día de actividad:");
 
@@ -294,11 +299,11 @@ private void guardarDatos() {
                                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(txtMHAid, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtMHA_IDact, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtMHAdia, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtMHAhora, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtMHAid, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtMHA_IDact, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtMHAhora, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(dia_actChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jBCancelar)
                                 .addGap(61, 61, 61)
@@ -321,22 +326,25 @@ private void guardarDatos() {
                     .addComponent(txtMHAid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(txtMHAdia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(txtMHAhora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtMHA_IDact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBCancelar)
-                    .addComponent(jBLimpiar)
-                    .addComponent(jBGuardar))
-                .addGap(40, 40, 40))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(24, 24, 24)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6)
+                            .addComponent(txtMHAhora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtMHA_IDact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jBCancelar)
+                            .addComponent(jBLimpiar)
+                            .addComponent(jBGuardar))
+                        .addGap(40, 40, 40))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(dia_actChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -414,12 +422,13 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new MHActividades().setVisible(true);
+                new MHActividades().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private com.toedter.calendar.JDateChooser dia_actChooser;
     private javax.swing.JButton jBCancelar;
     private javax.swing.JButton jBGuardar;
     private javax.swing.JButton jBLimpiar;
@@ -432,7 +441,6 @@ private void guardarDatos() {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextField txtMHA_IDact;
-    private javax.swing.JTextField txtMHAdia;
     private javax.swing.JTextField txtMHAhora;
     private javax.swing.JTextField txtMHAid;
     private javax.swing.JTextField txtMUAccion;

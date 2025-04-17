@@ -3,11 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.prototipogym;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -23,40 +25,38 @@ public class PCobro extends javax.swing.JFrame {
         fechacobroChooser.setDate(new Date());
 
     }
-   
-    
-public static class GeneradorCobros {
+
+    public static class GeneradorCobros {
 
         private static final String RUTA_CLIENTES = "archivos/cliente.txt";
         private static final String RUTA_COBROS = "archivos/cobros.txt";
 
         // Patrón de fecha usado en el archivo cliente.txt, usando Locale para interpretar "abr"
-        private static final DateTimeFormatter FORMATO_FECHA =
-                DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("es", "ES"));
+        private static final DateTimeFormatter FORMATO_FECHA
+                = DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("es", "ES"));
 
         public static void generarCobros(LocalDate fechaCobroUsuario) throws IOException {
-            // Leer los registros existentes en cobros.txt para evitar duplicados
             List<String> registrosExistentes = new ArrayList<>();
             File archivoCobros = new File(RUTA_COBROS);
             if (archivoCobros.exists()) {
                 registrosExistentes = Files.readAllLines(archivoCobros.toPath());
             }
-            
+
             int ultimoId = obtenerUltimoIdCobro(registrosExistentes);
-            
+
             List<String> lineasClientes = Files.readAllLines(Paths.get(RUTA_CLIENTES));
             List<String> nuevosCobros = new ArrayList<>();
 
             for (String linea : lineasClientes) {
                 String[] datos = linea.split(",");
                 if (datos.length < 14) {
-                    continue; // demasiados valores, solo son 13
+                    continue;
                 }
+
                 String idCliente = datos[0].trim();
                 String fechaIngresoStr = datos[8].trim();
                 String valorCobroStr = datos[13].trim();
-                
-                // Intentar parsear la fecha de ingreso usando el patrón con Locale
+
                 LocalDate fechaIngreso;
                 try {
                     fechaIngreso = LocalDate.parse(fechaIngresoStr, FORMATO_FECHA);
@@ -64,43 +64,55 @@ public static class GeneradorCobros {
                     System.err.println("Error al parsear la fecha (" + fechaIngresoStr + ") para el cliente " + idCliente);
                     continue;
                 }
-                
-                // Verificar que hayan pasado al menos 30 días entre la fecha de ingreso y la fecha seleccionada
-                long diasTranscurridos = ChronoUnit.DAYS.between(fechaIngreso, fechaCobroUsuario);
-                if (diasTranscurridos < 30) {
+
+                // Si fecha de ingreso es después de la fecha de corte, se ignora
+                if (fechaIngreso.isAfter(fechaCobroUsuario)) {
                     continue;
                 }
-                
-                
-                LocalDate fechaCobroGenerado = fechaCobroUsuario;
-                
-                // Verificar si ya se generó un cobro para este cliente y  fecha
-                if (existeCobro(registrosExistentes, idCliente, fechaCobroGenerado.format(FORMATO_FECHA))) {
-                    continue;
+
+                // Generar cobros por cada mes completo desde la fecha de ingreso hasta la fecha del cobro
+                LocalDate fechaActualCobro = fechaIngreso.plusMonths(1);
+                int diaIngreso = fechaIngreso.getDayOfMonth();
+
+                while (!fechaActualCobro.isAfter(fechaCobroUsuario)) {
+                    // Asegurar que el día exista en el mes
+                    int ultimoDiaMes = fechaActualCobro.lengthOfMonth();
+                    if (diaIngreso > ultimoDiaMes) {
+                        fechaActualCobro = fechaActualCobro.withDayOfMonth(ultimoDiaMes);
+                    } else {
+                        fechaActualCobro = fechaActualCobro.withDayOfMonth(diaIngreso);
+                    }
+
+                    // Si el cobro ya existe, lo saltamos
+                    if (existeCobro(registrosExistentes, idCliente, fechaActualCobro.format(FORMATO_FECHA))) {
+                        fechaActualCobro = fechaActualCobro.plusMonths(1);
+                        continue;
+                    }
+
+                    ultimoId++;
+                    String idCobro = String.format("%03d", ultimoId);
+
+                    String mesTexto = fechaActualCobro.getMonth().getDisplayName(TextStyle.FULL, new Locale("es")).substring(0, 1).toUpperCase()
+                            + fechaActualCobro.getMonth().getDisplayName(TextStyle.FULL, new Locale("es")).substring(1);
+                    String concepto = "Cobro " + mesTexto + " " + fechaActualCobro.getYear();
+                    String status = "false";
+
+                    String registroCobro = idCobro + ","
+                            + fechaActualCobro.format(FORMATO_FECHA) + ","
+                            + idCliente + ","
+                            + valorCobroStr + ","
+                            + concepto + ","
+                            + status;
+
+                    nuevosCobros.add(registroCobro);
+                    registrosExistentes.add(registroCobro);
+
+                    // Avanzar al siguiente mes
+                    fechaActualCobro = fechaActualCobro.plusMonths(1);
+
                 }
-                
-                ultimoId++;
-                String idCobro = String.format("%03d", ultimoId);
-                
-                // para el "Cobro [mes] [año]"
-                String mesTexto = fechaCobroGenerado.getMonth().toString().substring(0, 1) +
-                                   fechaCobroGenerado.getMonth().toString().substring(1).toLowerCase();
-                String concepto = "Cobro " + mesTexto + " " + fechaCobroGenerado.getYear();
-                
-                String status = "false";
-                
-                
-                String registroCobro = idCobro + "," +
-                        fechaCobroGenerado.format(FORMATO_FECHA) + "," +
-                        idCliente + "," +
-                        valorCobroStr + "," +
-                        concepto + "," +
-                        status;
-                
-                nuevosCobros.add(registroCobro);
-                // se grega a la lista de existente para evitar duplicados en el mismo proceso.
-                registrosExistentes.add(registroCobro);
             }
+
             if (!nuevosCobros.isEmpty()) {
                 Files.write(Paths.get(RUTA_COBROS), nuevosCobros, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                 System.out.println("Se generaron " + nuevosCobros.size() + " nuevos cobros.");
@@ -109,22 +121,28 @@ public static class GeneradorCobros {
             }
         }
 
-       
         private static boolean existeCobro(List<String> registros, String idCliente, String fechaCobro) {
             for (String reg : registros) {
                 String[] campos = reg.split(",");
                 if (campos.length >= 3) {
                     String idClienteExistente = campos[2].trim();
                     String fechaCobroExistente = campos[1].trim();
-                    if (idClienteExistente.equals(idCliente) && fechaCobroExistente.equals(fechaCobro)) {
-                        return true;
+                    if (idClienteExistente.equals(idCliente)) {
+                        try {
+                            LocalDate fechaExistente = LocalDate.parse(fechaCobroExistente, FORMATO_FECHA);
+                            LocalDate fechaNueva = LocalDate.parse(fechaCobro, FORMATO_FECHA);
+                            if (fechaExistente.equals(fechaNueva)) {
+                                return true;
+                            }
+                        } catch (Exception e) {
+                            continue;
+                        }
                     }
                 }
             }
             return false;
         }
 
-        
         private static int obtenerUltimoIdCobro(List<String> registros) {
             int ultimo = 0;
             for (String reg : registros) {
@@ -143,9 +161,9 @@ public static class GeneradorCobros {
             return ultimo;
         }
     }
-    
+
     private void cancelar() {
-        this.dispose();  
+        this.dispose();
     }
 
     /**
@@ -255,8 +273,8 @@ public static class GeneradorCobros {
     }//GEN-LAST:event_btnVolverActionPerformed
 
     /**
-     * @param args the command line arguments*/
-     
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

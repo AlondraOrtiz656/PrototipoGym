@@ -70,7 +70,7 @@ private void cargarUsuario() {
                 String fechaStringNac = datos[5]; // Fecha de nacimiento
                 String fechaStringIng = datos[8]; // Fecha de ingreso
 
-                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
 
                 try {
                     // Parsear la fecha de nacimiento
@@ -156,7 +156,7 @@ private boolean validarCampos() {
         
 private void guardarDatos() {
     if (!validarCampos()) {
-        JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.\nExcepto correo, balance y cuota.", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.\nExcepto correo y balance.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
 
@@ -214,8 +214,8 @@ private void guardarDatos() {
     Date fechaNacDate = fechanacChooser.getDate();
     Date fechaIngDate = fechaingreChooser.getDate();
 
-    // Formatear las fechas a cadena con el formato "d MMM yyyy"
-    SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES"));
+    // Formatear las fechas a cadena con el formato "dd MMM yyyy"
+    SimpleDateFormat sdfOutput = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES"));
 
     String fechaNacString = sdfOutput.format(fechaNacDate);
     String fechaIngString = sdfOutput.format(fechaIngDate);

@@ -77,11 +77,11 @@
                                       <Component id="jLabel6" alignment="0" pref="128" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="txtMHAid" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtMHA_IDact" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtMHAdia" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtMHAhora" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="txtMHAid" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtMHA_IDact" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtMHAhora" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="dia_actChooser" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
@@ -114,26 +114,31 @@
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtMHAdia" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtMHAhora" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="txtMHA_IDact" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="40" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jBCancelar" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBLimpiar" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBGuardar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="dia_actChooser" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtMHAhora" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txtMHA_IDact" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace pref="40" max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jBCancelar" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jBLimpiar" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jBGuardar" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -156,11 +161,6 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtMHAidActionPerformed"/>
           </Events>
-        </Component>
-        <Component class="javax.swing.JTextField" name="txtMHAdia">
-          <Properties>
-            <Property name="columns" type="int" value="12"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">
           <Properties>
@@ -222,6 +222,8 @@
           <Properties>
             <Property name="columns" type="int" value="12"/>
           </Properties>
+        </Component>
+        <Component class="com.toedter.calendar.JDateChooser" name="dia_actChooser">
         </Component>
       </SubComponents>
     </Container>

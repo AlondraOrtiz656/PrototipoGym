@@ -1,1 +1,3 @@
 1234,Patroclo,Suarez,De los santos,Nibaje  calle #1  # 31  santiago de los caballeros,9 ene 1997,809-908-0908,809-908-0908,16 ene 2025,Activo,1,,0.0,1500.0
+2121,Patroclo,Suarez,De los santos,Nibaje  calle #1  # 31  santiago de los caballeros,09 ene 1997,809-908-0908,809-908-0908,04 dic 2024,Activo,1,,0.0,2000.0
+2222,Patroclo,Suarez,De los santos,Nibaje  calle #1  # 31  santiago de los caballeros,09 ene 1997,809-908-0908,809-908-0908,01 ene 2025,Activo,1,,0.0,1500.0

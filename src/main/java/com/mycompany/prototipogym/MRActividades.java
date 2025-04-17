@@ -69,7 +69,7 @@ public class MRActividades extends javax.swing.JFrame {
                 String fechaStringBaja = datos[2];
 
                 // Definir el formato de fecha con configuración regional en español
-                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES"));
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES"));
 
                 try {
                     // Parsear la fecha de reserva y asignarla al componente de selección de fecha
@@ -200,13 +200,15 @@ private void guardarDatos() {
         return;
     }
 
-    int id_estado_reserva;
-    
-    try {
-            id_estado_reserva = Integer.parseInt(txtMRAid.getText());    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID inválido. Deber ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+   int id_reservaact;
+
+try {
+    id_reservaact = Integer.parseInt(txtMRAid.getText());
+} catch (NumberFormatException e) {
+    JOptionPane.showMessageDialog(this, "ID inválido. Debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
+    return;
+}
+
           
     String id_estadoreser = txtMRA_IDestadoreser.getText();
     int id_cliente;    
@@ -247,36 +249,42 @@ private void guardarDatos() {
     Date fechaBajaDate = fechabajaChooser.getDate();
 
     // Formatear las fechas a cadenas con el formato "d MMM yyyy"
-    SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES"));
+    SimpleDateFormat sdfOutput = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES"));
 
     String fechaReserString = sdfOutput.format(fechaReserDate);  // Formatea la fecha de reserva
     String fechaBajaString = sdfOutput.format(fechaBajaDate);    // Formatea la fecha de baja
 
     // Incluir las fechas en la cadena para guardar en el archivo
-    String nuevaLinea = id_estado_reserva + "," + fechaReserString + "," + fechaBajaString + "," + id_estadoreser + "," +
-            id_cliente + "," + id_actividad + "," + id_horarioact;
-    
-    File archivo = new File(FILE_PATH);
-    boolean reservaactExiste = false;
-    StringBuilder contenido = new StringBuilder();
+    String nuevaLinea = id_reservaact + "," + fechaReserString + "," + fechaBajaString + "," + id_estadoreser + "," +
+        id_cliente + "," + id_actividad + "," + id_horarioact;
 
-    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            String[] datos = linea.split(",");
-            if (datos.length >= 2) {
-                if ((datos[0]).equals(id_estado_reserva)) {
-                    contenido.append(nuevaLinea).append("\n");
-                    reservaactExiste = true;
-                } else {
-                    contenido.append(linea).append("\n");
-                }
+File archivo = new File(FILE_PATH);
+boolean reservaactExiste = false;
+StringBuilder contenido = new StringBuilder();
+
+try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+    String linea;
+    while ((linea = br.readLine()) != null) {
+        String[] datos = linea.split(",");
+        if (datos.length >= 2) {
+            if (datos[0].equals(String.valueOf(id_reservaact))) {
+                // Si es el mismo ID, se reemplaza por la nueva línea
+                contenido.append(nuevaLinea).append("\n");
+                reservaactExiste = true;
+            } else {
+                contenido.append(linea).append("\n");
             }
         }
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al leer el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
     }
+} catch (IOException e) {
+    JOptionPane.showMessageDialog(this, "Error al leer el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+    return;
+}
+
+if (!reservaactExiste) {
+    contenido.append(nuevaLinea).append("\n");
+}
+
 
     if (!reservaactExiste) {
         contenido.append(nuevaLinea).append("\n");
@@ -551,8 +559,7 @@ private void guardarDatos() {
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGuardarActionPerformed
-        guardarDatos();        
-        
+        guardarDatos();                
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMRA_IDactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMRA_IDactActionPerformed

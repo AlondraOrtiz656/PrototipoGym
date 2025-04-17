@@ -240,9 +240,19 @@ public class Menu extends javax.swing.JFrame {
         jMenu4.add(jMenuItem20);
 
         jMenuItem21.setText("De Cobro por Rango de Fecha");
+        jMenuItem21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem21ActionPerformed(evt);
+            }
+        });
         jMenu4.add(jMenuItem21);
 
         jMenuItem22.setText("De Cobro por Cliente");
+        jMenuItem22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem22ActionPerformed(evt);
+            }
+        });
         jMenu4.add(jMenuItem22);
 
         jMenuItem23.setText("De Cuota por Fecha");
@@ -260,6 +270,11 @@ public class Menu extends javax.swing.JFrame {
         jMenu4.add(jMenuItem25);
 
         jMenuItem26.setText("De Clientes con Balance Pendiente");
+        jMenuItem26.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem26ActionPerformed(evt);
+            }
+        });
         jMenu4.add(jMenuItem26);
 
         jMenuBar1.add(jMenu4);
@@ -321,7 +336,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        MHActividades MHA = new MHActividades(this);
+        MHActividades MHA = new MHActividades();
         MHA.setVisible(true);
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
@@ -374,6 +389,21 @@ public class Menu extends javax.swing.JFrame {
         PCobro PC = new PCobro();
         PC.setVisible(true);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem21ActionPerformed
+        CCobroRF CCRF = new CCobroRF();
+        CCRF.setVisible(true);
+    }//GEN-LAST:event_jMenuItem21ActionPerformed
+
+    private void jMenuItem22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem22ActionPerformed
+        CCobroC CCC = new CCobroC();
+        CCC.setVisible(true);
+    }//GEN-LAST:event_jMenuItem22ActionPerformed
+
+    private void jMenuItem26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem26ActionPerformed
+        CClientesBP CCBP = new CClientesBP();
+        CCBP.setVisible(true);
+    }//GEN-LAST:event_jMenuItem26ActionPerformed
 
     /**
      * @param args the command line arguments

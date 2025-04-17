@@ -59,7 +59,7 @@ public class MReservas extends javax.swing.JFrame {
                 txtMR_IDsalareserva.setText(datos[1]);
                 txtMR_IDclientereser.setText(datos[2]);                
                 String fechaString = datos[3];
-                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES")); // Asegura la configuración regional en español
                 try {
                     Date fecha = sdf.parse(fechaString);  // Convierte la fecha de texto a un objeto Date
                     fechareserChooser.setDate(fecha);  // Asigna la fecha al componente de selección de fecha
@@ -224,7 +224,7 @@ private void guardarDatos() {
         JOptionPane.showMessageDialog(this, "El ID de estado de reserva no existe. Ingrese un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
-    SimpleDateFormat sdfGuardar = new SimpleDateFormat("d MMM yyyy", new java.util.Locale("es", "ES"));
+    SimpleDateFormat sdfGuardar = new SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es", "ES"));
     String fechaFormateada = sdfGuardar.format(fechareserDate);  // Formatea la fecha a "9 abr 2025"
     String nuevaLinea = id_reservas + "," + id_salareserva + "," + id_cliente + "," + fechaFormateada + "," + id_reserva_actividad + "," + id_estado_reserva;
 
