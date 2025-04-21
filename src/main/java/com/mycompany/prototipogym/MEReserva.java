@@ -18,16 +18,14 @@ import javax.swing.JOptionPane;
  */
 public class MEReserva extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/estado_reserva.txt";
-    private Menu menuOriginal;
 
     /**
      * Creates new form MUsuario
      */
-    public MEReserva(Menu menu) {
+    public MEReserva() {
         initComponents();
-        setTitle("Mantenimiento de Estado de Reserva");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
 
     }
     
@@ -133,9 +131,7 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
+
     }
 
     /**
@@ -344,7 +340,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new MEReserva().setVisible(true);
+                new MEReserva().setVisible(true);
             }
         });
     }

@@ -22,19 +22,15 @@ import javax.swing.JOptionPane;
  */
 public class MCliente extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/cliente.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MUsuario
      */
-    public MCliente(Menu menu) {
+    public MCliente() {
         initComponents();
-        setTitle("Mantenimiento de Cliente");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
-
     }
     
 
@@ -192,15 +188,11 @@ private void guardarDatos() {
 
     String correo = txtMCcorreo.getText();
 
-    double balance = 0.0;
+    double balance;
     double cuota = 0.0;
 
-    try {
-        balance = Double.parseDouble(txtMCbalance.getText());
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Balance inválido. Se establecerá en 0.0 por defecto.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-    }
-
+    balance =+ cuota;
+    
     try {
         cuota = Double.parseDouble(txtMCvalorcuota.getText());
     } catch (NumberFormatException e) {
@@ -284,9 +276,7 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
+
     }
 
     /**
@@ -408,6 +398,7 @@ private void guardarDatos() {
 
         txtMCbalance.setEditable(false);
         txtMCbalance.setColumns(12);
+        txtMCbalance.setEnabled(false);
 
         txtMCcorreo.setColumns(12);
 
@@ -697,7 +688,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new MCliente().setVisible(true);
+                new MCliente().setVisible(true);
             }
         });
     }

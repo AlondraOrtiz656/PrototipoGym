@@ -16,13 +16,11 @@ public class CUsuarios extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/usuarios.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
-    public CUsuarios(Menu menu) {
+    public CUsuarios() {
         initComponents();
-        setTitle("Consulta de Usuarios");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -68,9 +66,7 @@ public class CUsuarios extends javax.swing.JFrame {
     }
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  
-    }
+
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -216,7 +212,7 @@ public class CUsuarios extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new CUsuarios().setVisible(true);
+               new CUsuarios().setVisible(true);
             }
         });
     }

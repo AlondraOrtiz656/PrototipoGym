@@ -16,13 +16,11 @@ public class CHActividades extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/horario_act.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
-    public CHActividades(Menu menu) {
+    public CHActividades() {
         initComponents();
-        setTitle("Consulta de Horarios de Actividades");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -68,9 +66,6 @@ public class CHActividades extends javax.swing.JFrame {
     
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  
-    }
     }
 
     /**

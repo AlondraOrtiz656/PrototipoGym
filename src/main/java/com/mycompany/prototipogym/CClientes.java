@@ -16,13 +16,11 @@ public class CClientes extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/cliente.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
-    public CClientes(Menu menu) {
+    public CClientes() {
         initComponents();
         setTitle("Consulta de Clientes");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -77,9 +75,7 @@ public class CClientes extends javax.swing.JFrame {
     }
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  
-    }
+
     }
     
     /**

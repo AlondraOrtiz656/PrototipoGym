@@ -16,13 +16,11 @@ public class CSalas extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/salas.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
-    public CSalas(Menu menu) {
+    public CSalas() {
         initComponents();
-        setTitle("Consulta de Salas");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -70,9 +68,7 @@ public class CSalas extends javax.swing.JFrame {
     
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  
-    }
+
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -219,7 +215,7 @@ public class CSalas extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new CSalas().setVisible(true);
+                new CSalas().setVisible(true);
             }
         });
     }

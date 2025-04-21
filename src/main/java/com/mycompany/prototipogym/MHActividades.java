@@ -28,7 +28,7 @@ public class MHActividades extends javax.swing.JFrame {
      */
     public MHActividades() {
         initComponents();
-        setTitle("Mantenimienlto de Horario de Actividades");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
     }
     

@@ -16,14 +16,12 @@ public class CEntrenador extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/entrenador.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
 
-    public CEntrenador(Menu menu) {
+    public CEntrenador() {
         initComponents();
-        setTitle("Consulta de Entrenador");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -70,9 +68,7 @@ public class CEntrenador extends javax.swing.JFrame {
     
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  
-    }
+
     }
 
     /**
@@ -220,7 +216,7 @@ public class CEntrenador extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new CEntrenador().setVisible(true);
+               new CEntrenador().setVisible(true);
             }
         });
     }

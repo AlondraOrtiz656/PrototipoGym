@@ -19,7 +19,7 @@ public class CClientesBP extends javax.swing.JFrame {
 
     public CClientesBP() {
         initComponents();
-        setTitle("Consulta de Clientes con Balance Pendiente");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
         cargarUsuarios();
     }

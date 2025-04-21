@@ -8,3 +8,4 @@
 008,01 feb 2025,2222,1500.0,Cobro Febrero 2025,false
 009,01 mar 2025,2222,1500.0,Cobro Marzo 2025,false
 010,01 abr 2025,2222,1500.0,Cobro Abril 2025,false
+011,04 abr 2025,1111,1000.0,Cobro Abril 2025,false

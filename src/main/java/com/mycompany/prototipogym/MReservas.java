@@ -22,18 +22,15 @@ import javax.swing.JOptionPane;
  */
 public class MReservas extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/reservas.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MActividades
      */
-    public MReservas(Menu menu) {
+    public MReservas() {
         initComponents();
-        setTitle("Mantenimiento de Reservas");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
     }
     
 
@@ -278,9 +275,6 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
     }
 
     /**
@@ -587,7 +581,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new MReservas().setVisible(true);
+                new MReservas().setVisible(true);
             }
         });
     }

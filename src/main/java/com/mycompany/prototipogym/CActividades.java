@@ -16,13 +16,11 @@ public class CActividades extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/actividades.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
-    public CActividades(Menu menu) {
+    public CActividades() {
         initComponents();
-        setTitle("Consulta de Actividades");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -68,9 +66,7 @@ public class CActividades extends javax.swing.JFrame {
     }
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  
-    }
+
     }
     
     /**

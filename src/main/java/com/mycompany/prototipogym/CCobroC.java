@@ -19,7 +19,7 @@ public class CCobroC extends javax.swing.JFrame {
 
     public CCobroC() {
         initComponents();
-        setTitle("Consulta de Cobros por Rango de Fecha");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
         cargarUsuarios();
     }

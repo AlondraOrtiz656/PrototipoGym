@@ -18,18 +18,15 @@ import javax.swing.JOptionPane;
  */
 public class MEntrenador extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/entrenador.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MUsuario
      */
-    public MEntrenador(Menu menu) {
+    public MEntrenador() {
         initComponents();
-        setTitle("Mantenimiento de Entrenador");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
 
     }
     
@@ -162,9 +159,7 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
+
     }
 
     /**
@@ -399,7 +394,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new MEntrenador().setVisible(true);
+               new MEntrenador().setVisible(true);
             }
         });
     }

@@ -18,18 +18,15 @@ import javax.swing.JOptionPane;
  */
 public class MSalas extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/salas.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MSalas
      */
-    public MSalas(Menu menu) {
+    public MSalas() {
         initComponents();
-        setTitle("Mantenimiento de Salas");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
     }
     
 
@@ -190,9 +187,6 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
     }
 
     /**

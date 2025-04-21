@@ -18,18 +18,15 @@ import javax.swing.JOptionPane;
  */
 public class MUsuario extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/usuarios.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MUsuario
      */
-    public MUsuario(Menu menu) {
+    public MUsuario() {
         initComponents();
-        setTitle("Mantenimiento de Usuario");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
     }
     
 
@@ -159,9 +156,6 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
     }
 
     /**
@@ -415,7 +409,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new MUsuario().setVisible(true);
+               new MUsuario().setVisible(true);
             }
         });
     }

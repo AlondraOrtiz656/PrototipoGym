@@ -22,7 +22,7 @@ public class Menu extends javax.swing.JFrame {
     public Menu(int nivelUsuario) {
         initComponents();
         this.nivelUsuario = nivelUsuario;
-        setTitle("Menú Principal");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
         setExtendedState(MAXIMIZED_BOTH);
         configurarAccesos();
@@ -296,13 +296,13 @@ public class Menu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        MSalas ms = new MSalas(this);  // le pasas el menú actual
+        MSalas ms = new MSalas();  // le pasas el menú actual
         ms.setVisible(true);
         
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
-        MRActividades MRA = new MRActividades(this);
+        MRActividades MRA = new MRActividades();
         MRA.setVisible(true);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
@@ -311,27 +311,27 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
     private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
-        CHActividades CHA = new CHActividades(this);
+        CHActividades CHA = new CHActividades();
         CHA.setVisible(true);
     }//GEN-LAST:event_jMenuItem20ActionPerformed
 
     private void MUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MUsuarioActionPerformed
-        MUsuario MU = new MUsuario(this);
+        MUsuario MU = new MUsuario();
         MU.setVisible(true);
     }//GEN-LAST:event_MUsuarioActionPerformed
 
     private void MEntrenadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MEntrenadorActionPerformed
-        MEntrenador ME = new MEntrenador(this);
+        MEntrenador ME = new MEntrenador();
         ME.setVisible(true);
     }//GEN-LAST:event_MEntrenadorActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-        MLocalizacion ML = new MLocalizacion(this);
+        MLocalizacion ML = new MLocalizacion();
         ML.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
-        MActividades MA = new MActividades(this);
+        MActividades MA = new MActividades();
         MA.setVisible(true);
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
@@ -341,47 +341,47 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
-        MCliente MC = new MCliente(this);
+        MCliente MC = new MCliente();
         MC.setVisible(true);
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
-        MEReserva MER = new MEReserva(this);
+        MEReserva MER = new MEReserva();
         MER.setVisible(true);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
-        MReservas MR = new MReservas(this);
+        MReservas MR = new MReservas();
         MR.setVisible(true);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        CUsuarios CU = new CUsuarios(this);
+        CUsuarios CU = new CUsuarios();
         CU.setVisible(true);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem16ActionPerformed
-        CEntrenador CE = new CEntrenador(this);
+        CEntrenador CE = new CEntrenador();
         CE.setVisible(true);
     }//GEN-LAST:event_jMenuItem16ActionPerformed
 
     private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
-        CLocalizacion CL = new CLocalizacion(this);
+        CLocalizacion CL = new CLocalizacion();
         CL.setVisible(true);
     }//GEN-LAST:event_jMenuItem17ActionPerformed
 
     private void jMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem18ActionPerformed
-        CSalas CS = new CSalas(this);
+        CSalas CS = new CSalas();
         CS.setVisible(true);
     }//GEN-LAST:event_jMenuItem18ActionPerformed
 
     private void jMenuItem19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem19ActionPerformed
-        CActividades CA = new CActividades(this);
+        CActividades CA = new CActividades();
         CA.setVisible(true);
     }//GEN-LAST:event_jMenuItem19ActionPerformed
 
     private void jMenuItem25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem25ActionPerformed
-        CClientes CC = new CClientes(this);
+        CClientes CC = new CClientes();
         CC.setVisible(true);
     }//GEN-LAST:event_jMenuItem25ActionPerformed
 

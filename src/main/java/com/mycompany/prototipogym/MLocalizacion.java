@@ -18,17 +18,14 @@ import javax.swing.JOptionPane;
  */
 public class MLocalizacion extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/localizacion.txt";
-    private Menu menuOriginal;
 
     /**
      * Creates new form MUsuario
      */
-    public MLocalizacion(Menu menu) {
+    public MLocalizacion() {
         initComponents();
-        setTitle("Mantenimiento de Localización");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
 
     }
     
@@ -148,9 +145,6 @@ private void guardarDatos() {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
     }
 
     /**
@@ -348,7 +342,7 @@ private void guardarDatos() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new MLocalizacion().setVisible(true);
+                new MLocalizacion().setVisible(true);
             }
         });
     }

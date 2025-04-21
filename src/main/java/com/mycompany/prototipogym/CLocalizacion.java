@@ -16,13 +16,11 @@ public class CLocalizacion extends javax.swing.JFrame {
 
     private static final String FILE_PATH = "archivos/localizacion.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
-    private Menu menuOriginal;
 
-    public CLocalizacion(Menu menu) {
+    public CLocalizacion() {
         initComponents();
-        setTitle("Consulta de Localización");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
         cargarUsuarios();
     }
 
@@ -67,9 +65,6 @@ public class CLocalizacion extends javax.swing.JFrame {
     
     private void cancelar() {
         this.dispose();  
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true); 
-    }
     }
 
     /**
@@ -217,7 +212,7 @@ public class CLocalizacion extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new CLocalizacion().setVisible(true);
+                new CLocalizacion().setVisible(true);
             }
         });
     }

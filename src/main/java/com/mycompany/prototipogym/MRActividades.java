@@ -12,9 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Date;
 import javax.swing.JOptionPane;
 
@@ -24,19 +21,15 @@ import javax.swing.JOptionPane;
  */
 public class MRActividades extends javax.swing.JFrame {
     private static final String FILE_PATH = "archivos/reserva_actividad.txt";
-    private Menu menuOriginal;
 
 
     /**
      * Creates new form MActividades
      */
-    public MRActividades(Menu menu) {
+    public MRActividades() {
         initComponents();
-        setTitle("Mantenimiento de Reservas de Actividades");
+        setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        this.menuOriginal = menu;
-
-
     }
     
 
@@ -316,9 +309,7 @@ if (!reservaactExiste) {
     
     private void cancelar() {
         this.dispose();  // cierras MSalas
-        if (menuOriginal != null) {
-        menuOriginal.setVisible(true);  // vuelves al menú anterior
-    }
+
     }
 
     /**
@@ -639,7 +630,7 @@ if (!reservaactExiste) {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new MRActividades().setVisible(true);
+               new MRActividades().setVisible(true);
             }
         });
     }
