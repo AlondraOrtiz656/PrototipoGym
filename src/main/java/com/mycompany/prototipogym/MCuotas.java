@@ -5,6 +5,7 @@
 package com.mycompany.prototipogym;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,8 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -223,7 +226,10 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
 } catch (IOException e) {
     mostrarError("guardar detalle cuota", e);
 }
+   
 }
+
+
 
 
 
@@ -548,7 +554,10 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMC_IDclienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMC_IDclienteActionPerformed
-        // TODO add your handling code here:
+        String idCliente = txtMC_IDcliente.getText().trim();
+        if (!idCliente.isEmpty()) {
+            cargarNombreCliente(idCliente);
+        }
     }//GEN-LAST:event_txtMC_IDclienteActionPerformed
 
     private void txtMCvalorcobroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMCvalorcobroActionPerformed
@@ -560,10 +569,7 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
     }//GEN-LAST:event_txtnombreclienteActionPerformed
 
     private void txtMC_IDclienteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMC_IDclienteFocusLost
-        String idCliente = txtMC_IDcliente.getText().trim();
-        if (!idCliente.isEmpty()) {
-            cargarNombreCliente(idCliente);
-        }
+        
     }//GEN-LAST:event_txtMC_IDclienteFocusLost
 
     /**

@@ -4,6 +4,10 @@
  */
 package com.mycompany.prototipogym;
 
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
 /**
  *
  * @author Carlos Collado
@@ -22,11 +26,22 @@ public class Menu extends javax.swing.JFrame {
     public Menu(int nivelUsuario) {
         initComponents();
         this.nivelUsuario = nivelUsuario;
+        this.setExtendedState(MAXIMIZED_BOTH);
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
-        setExtendedState(MAXIMIZED_BOTH);
         configurarAccesos();
+        
+        
+        jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+        this.setLayout(new BorderLayout());
+        this.add(jLabel1, BorderLayout.CENTER);
+         // maximiza
+        this.setVisible(true);
     }
+    
+    
     private void configurarAccesos() {
         
         if (nivelUsuario == 1) {  // Usuario normal
@@ -44,6 +59,7 @@ public class Menu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MUsuario = new javax.swing.JMenuItem();
@@ -77,6 +93,8 @@ public class Menu extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Menú Gym");
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/borde_cir.png"))); // NOI18N
 
         jMenu1.setText("Mantenimientos");
 
@@ -165,6 +183,11 @@ public class Menu extends javax.swing.JFrame {
         jMenu2.setText("Movimientos");
 
         jMenuItem2.setText("Cuotas");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem2);
 
         jMenuBar1.add(jMenu2);
@@ -285,11 +308,17 @@ public class Menu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 667, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(305, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(384, 384, 384))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 442, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(77, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(74, 74, 74))
         );
 
         pack();
@@ -307,7 +336,8 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
-        // TODO add your handling code here:
+       PACuota PAC = new PACuota();
+       PAC.setVisible(true);
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
     private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
@@ -405,6 +435,11 @@ public class Menu extends javax.swing.JFrame {
         CCBP.setVisible(true);
     }//GEN-LAST:event_jMenuItem26ActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        MCuotas MCuotas = new MCuotas();
+        MCuotas.setVisible(true);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -442,6 +477,7 @@ public class Menu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem MEntrenador;
     private javax.swing.JMenuItem MUsuario;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;

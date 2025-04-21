@@ -4,7 +4,11 @@
  */
 package com.mycompany.prototipogym;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.*;
@@ -119,6 +123,7 @@ public class PCobro extends javax.swing.JFrame {
             } else {
                 System.out.println("No se generaron nuevos cobros.");
             }
+            actualizarBalancesDesdeCobros();
         }
 
         private static boolean existeCobro(List<String> registros, String idCliente, String fechaCobro) {
@@ -161,6 +166,62 @@ public class PCobro extends javax.swing.JFrame {
             return ultimo;
         }
     }
+public static void actualizarBalancesDesdeCobros() {
+    String cobroPath = "archivos/cobros.txt"; // corregido
+    String clientePath = "archivos/cliente.txt";
+
+    Map<String, Double> saldoPendiente = new HashMap<>();
+
+    try (BufferedReader br = new BufferedReader(new FileReader(cobroPath))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 6) {
+                String idCliente = datos[2].trim();
+                double valor = Double.parseDouble(datos[3].trim());
+                String status = datos[5].trim().toLowerCase(); // corregido a índice 5
+
+                if (status.equals("false")) {
+                    saldoPendiente.put(idCliente,
+                        saldoPendiente.getOrDefault(idCliente, 0.0) + valor);
+                }
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error leyendo cobros.txt: " + e.getMessage());
+        return;
+    }
+
+    List<String> clientesActualizados = new ArrayList<>();
+
+    try (BufferedReader br = new BufferedReader(new FileReader(clientePath))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 14) {
+                String idCliente = datos[0].trim();
+                double nuevoBalance = saldoPendiente.getOrDefault(idCliente, 0.0);
+                datos[12] = String.valueOf(nuevoBalance);
+                clientesActualizados.add(String.join(",", datos));
+            } else {
+                clientesActualizados.add(linea);
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error leyendo cliente.txt: " + e.getMessage());
+        return;
+    }
+
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(clientePath))) {
+        for (String linea : clientesActualizados) {
+            bw.write(linea);
+            bw.newLine();
+        }
+    } catch (IOException e) {
+        System.out.println("Error escribiendo cliente.txt: " + e.getMessage());
+    }
+}
+
 
     private void cancelar() {
         this.dispose();
