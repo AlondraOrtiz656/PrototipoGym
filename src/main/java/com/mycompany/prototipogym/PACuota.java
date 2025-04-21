@@ -15,8 +15,13 @@ public class PACuota extends javax.swing.JFrame {
      */
     public PACuota() {
         initComponents();
+        setTitle("Pantera Fitness");
+        setLocationRelativeTo(null);
     }
-
+    
+    private void cancelar() {
+            this.dispose();  
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -40,6 +45,11 @@ public class PACuota extends javax.swing.JFrame {
         btnprocesar.setText("Procesar");
 
         btnsalir.setText("Volver");
+        btnsalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnsalirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -93,6 +103,10 @@ public class PACuota extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsalirActionPerformed
+        cancelar();
+    }//GEN-LAST:event_btnsalirActionPerformed
+    
     /**
      * @param args the command line arguments
      */

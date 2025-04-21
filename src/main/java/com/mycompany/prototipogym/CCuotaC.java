@@ -12,12 +12,12 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author asist-depti
  */
-public class CCuotas extends javax.swing.JFrame {
+public class CCuotaC extends javax.swing.JFrame {
 
-    private static final String FILE_PATH = "archivos/cliente.txt";
+    private static final String FILE_PATH = "archivos/detalle_cuota.txt";
     private List<String[]> listaUsuarios = new ArrayList<>();
 
-    public CCuotas() {
+    public CCuotaC() {
         initComponents();
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
@@ -33,40 +33,23 @@ private void cargarUsuarios() {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",", -1);
-            if (datos.length >= 14) {
-                // Verificamos si el balance es mayor a 0
-                double balance = 0.0;
-                try {
-                    balance = Double.parseDouble(datos[12].trim());
-                } catch (NumberFormatException e) {
-                    // Si no es un número, se ignora este registro
-                    continue;
-                }
-
-                if (balance > 0) {
+            
+                if (datos.length >= 5) {
                     String[] fila = new String[] {
                         datos[0].trim(), // ID
-                        datos[1].trim(), // nombre
-                        datos[2].trim(), // apellido p
-                        datos[3].trim(), // apellido m
-                        datos[4].trim(), // Dirección
-                        datos[5].trim(), // fecha nac
-                        datos[6].trim(), // teléfono
-                        datos[7].trim(), // celular
-                        datos[8].trim(), // fecha ingreso
-                        datos[9].trim(), // status
-                        datos[10].trim().equals("1") ? "Socio" : "Invitado", // tipo
-                        datos[11].trim(), // correo
-                        datos[12].trim(), // balance
-                        datos[13].trim()  // cuota
+                        datos[1].trim(), // sec
+                        datos[2].trim(), // concepto
+                        datos[3].trim(), // valor cuota
+                        datos[4].trim()  // ID Cobro
+                        
                     };
                     modelo.addRow(fila);
                     listaUsuarios.add(fila);
-                }
+                
             }
         }
     } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al leer el archivo de clientes: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Error al leer el archivo de detalle cuota: " + e.getMessage());
     }
 }
 
@@ -109,24 +92,24 @@ private void cargarUsuarios() {
 
         CUTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Nombre", "Apellido Paterno", "Apellido Materno", "Dirección", "Fecha de Nacimiento"
+                "ID Cliente", "Secuencia", "Concepto", "Cuota", "ID Cobro"
             }
         ));
         jScrollPane1.setViewportView(CUTable);
 
-        jLabel1.setText("Consulta de Cuotas");
+        jLabel1.setText("Consulta de Cuotas por Cliente");
 
         jLabel2.setText("Filtrar por:");
 
-        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Nombre", "Apellido P", "Apellido M", "Dirección", "Fecha de Nacimiento", "Teléfono", "Celular", "Fecha Ingreso", "Ststus", "Tipo", "Correo", "Balance", "Cuota" }));
+        cmbfiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID Cliente", "Secuencia", "Concepto", "Cuota", "ID Cobro" }));
         cmbfiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbfiltroActionPerformed(evt);
@@ -154,28 +137,27 @@ private void cargarUsuarios() {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(32, 32, 32)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 869, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(txtconsulta)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtconsulta)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 627, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(410, 410, 410)
-                        .addComponent(btncancelar))
+                        .addGap(238, 238, 238)
+                        .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(414, 414, 414)
-                        .addComponent(jLabel1)))
-                .addContainerGap(38, Short.MAX_VALUE))
+                        .addGap(288, 288, 288)
+                        .addComponent(btncancelar)))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(23, 23, 23)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(cmbfiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -220,14 +202,22 @@ private void cargarUsuarios() {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CCuotas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CCuotaC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CCuotas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CCuotaC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CCuotas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CCuotaC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CCuotas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CCuotaC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -240,7 +230,7 @@ private void cargarUsuarios() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CCuotas().setVisible(true);
+                new CCuotaC().setVisible(true);
             }
         });
     }

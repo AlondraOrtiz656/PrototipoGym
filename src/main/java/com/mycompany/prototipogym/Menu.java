@@ -279,9 +279,19 @@ public class Menu extends javax.swing.JFrame {
         jMenu4.add(jMenuItem22);
 
         jMenuItem23.setText("De Cuota por Fecha");
+        jMenuItem23.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem23ActionPerformed(evt);
+            }
+        });
         jMenu4.add(jMenuItem23);
 
         jMenuItem24.setText("De Cuota por Clientes");
+        jMenuItem24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem24ActionPerformed(evt);
+            }
+        });
         jMenu4.add(jMenuItem24);
 
         jMenuItem25.setText("De Clientes");
@@ -439,6 +449,16 @@ public class Menu extends javax.swing.JFrame {
         MCuotas MCuotas = new MCuotas();
         MCuotas.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem24ActionPerformed
+        CCuotaC CCuotaC = new CCuotaC();
+        CCuotaC.setVisible(true);
+    }//GEN-LAST:event_jMenuItem24ActionPerformed
+
+    private void jMenuItem23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem23ActionPerformed
+        CCuotaF CCF = new CCuotaF();
+        CCF.setVisible(true);
+    }//GEN-LAST:event_jMenuItem23ActionPerformed
 
     /**
      * @param args the command line arguments
