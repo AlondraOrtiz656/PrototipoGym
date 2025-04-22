@@ -4,6 +4,18 @@
  */
 package com.mycompany.prototipogym;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author asist-depti
@@ -17,7 +29,84 @@ public class PACuota extends javax.swing.JFrame {
         initComponents();
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
+        // Establecer fecha de inicio: 1 de abril de 2025
+        Calendar inicio = Calendar.getInstance();
+        inicio.set(2025, Calendar.APRIL, 1); // Recuerda: los meses empiezan desde 0 (enero = 0)
+        fechainicioChooser.setDate(inicio.getTime());
+
+        // Establecer fecha final: 30 de abril de 2025
+        Calendar fin = Calendar.getInstance();
+        fin.set(2025, Calendar.APRIL, 30);
+        fechafinalChooser.setDate(fin.getTime());
     }
+    
+    private void procesarCobros() {
+    try {
+        Date fechaInicio = fechainicioChooser.getDate();
+        Date fechaFinal = fechafinalChooser.getDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "ES"));
+
+        // Cargar las líneas del detalle y extraer Id_Cobro_Cuota de los que están marcados como true
+        List<String> lineasDetalle = Files.readAllLines(Paths.get("archivos/detalle_cuota.txt"));
+        List<String> nuevasLineasDetalle = new ArrayList<>();
+        Set<String> cobrosPagados = new HashSet<>();
+
+        for (String linea : lineasDetalle) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 6 && partes[5].equalsIgnoreCase("true")) {
+                cobrosPagados.add(partes[4]); // Id_Cobro_Cuota
+            }
+        }
+
+        // Leer y actualizar cobro.txt
+        List<String> lineasCobro = Files.readAllLines(Paths.get("archivos/cobro.txt"));
+        List<String> nuevasLineasCobro = new ArrayList<>();
+
+        for (String linea : lineasCobro) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 6) {
+                String idCobro = partes[0];
+                Date fechaCobro = sdf.parse(partes[1]);
+
+                // Si el cobro es uno de los pagados y está en el rango, se marca como true
+                if (cobrosPagados.contains(idCobro) &&
+                        !fechaCobro.before(fechaInicio) &&
+                        !fechaCobro.after(fechaFinal)) {
+                    partes[5] = "true";
+                }
+
+                nuevasLineasCobro.add(String.join(",", partes));
+            } else {
+                nuevasLineasCobro.add(linea);
+            }
+        }
+
+        // Actualizar detalle_cuota.txt para marcar como Procesado
+        for (String linea : lineasDetalle) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 6 && partes[5].equalsIgnoreCase("true")) {
+                String idCobro = partes[4];
+                if (cobrosPagados.contains(idCobro)) {
+                    partes[5] = "Procesado";
+                }
+                nuevasLineasDetalle.add(String.join(",", partes));
+            } else {
+                nuevasLineasDetalle.add(linea);
+            }
+        }
+
+        // Guardar los archivos actualizados
+        Files.write(Paths.get("archivos/cobro.txt"), nuevasLineasCobro);
+        Files.write(Paths.get("archivos/detalle_cuota.txt"), nuevasLineasDetalle);
+
+        JOptionPane.showMessageDialog(this, "Cobros procesados correctamente.");
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al procesar cobros: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+}
+
     
     private void cancelar() {
             this.dispose();  
@@ -43,6 +132,11 @@ public class PACuota extends javax.swing.JFrame {
         jLabel1.setText("Actualizar Cobro");
 
         btnprocesar.setText("Procesar");
+        btnprocesar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnprocesarActionPerformed(evt);
+            }
+        });
 
         btnsalir.setText("Volver");
         btnsalir.addActionListener(new java.awt.event.ActionListener() {
@@ -106,6 +200,10 @@ public class PACuota extends javax.swing.JFrame {
     private void btnsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsalirActionPerformed
         cancelar();
     }//GEN-LAST:event_btnsalirActionPerformed
+
+    private void btnprocesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnprocesarActionPerformed
+         procesarCobros();
+    }//GEN-LAST:event_btnprocesarActionPerformed
     
     /**
      * @param args the command line arguments
