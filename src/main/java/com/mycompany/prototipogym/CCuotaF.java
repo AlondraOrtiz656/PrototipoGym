@@ -40,7 +40,7 @@ private void cargarUsuarios() {
                         datos[1].trim(), // fecha
                         datos[2].trim(), // ID Cliente
                         datos[3].trim(), // Valor cobro
-                        datos[4].trim()  // Status
+                        datos[4].trim().equals("false") ? "Pendiente" : "Pagado",  // Status
                         
                     };
                     modelo.addRow(fila);

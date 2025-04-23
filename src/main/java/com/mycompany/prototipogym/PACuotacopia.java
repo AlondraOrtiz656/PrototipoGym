@@ -20,12 +20,12 @@ import javax.swing.JOptionPane;
  *
  * @author asist-depti
  */
-public class PACuota extends javax.swing.JFrame {
+public class PACuotacopia extends javax.swing.JFrame {
 
     /**
      * Creates new form PACuota
      */
-    public PACuota() {
+    public PACuotacopia() {
         initComponents();
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
@@ -82,46 +82,18 @@ public class PACuota extends javax.swing.JFrame {
         }
 
         // Actualizar detalle_cuota.txt para marcar como Procesado
-        // Calcular nuevo ID de cuota
-
-
-// 1. Determinar el nuevo Id_Cuota para las cuotas NO procesadas
-int nuevoIdCuota = 1;
-for (String linea : lineasDetalle) {
-    String[] partes = linea.split(",");
-    if (partes.length >= 6 && (partes[5].equalsIgnoreCase("true") || partes[5].equalsIgnoreCase("Procesado"))) {
-        try {
-            int id = Integer.parseInt(partes[0]);
-            if (id >= nuevoIdCuota) {
-                nuevoIdCuota = id + 1;
+        for (String linea : lineasDetalle) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 6 && partes[5].equalsIgnoreCase("true")) {
+                String idCobro = partes[4];
+                if (cobrosPagados.contains(idCobro)) {
+                    partes[5] = "Procesado";
+                }
+                nuevasLineasDetalle.add(String.join(",", partes));
+            } else {
+                nuevasLineasDetalle.add(linea);
             }
-        } catch (NumberFormatException ignored) {}
-    }
-}
-
-// 2. Actualizar cuotas procesadas (status "true" → "Procesado")
-for (int i = 0; i < lineasDetalle.size(); i++) {
-    String[] partes = lineasDetalle.get(i).split(",");
-    if (partes.length >= 6 && partes[5].equalsIgnoreCase("true")) {
-        if (cobrosPagados.contains(partes[4])) {
-            partes[5] = "Procesado";
         }
-        nuevasLineasDetalle.add(String.join(",", partes));
-    }
-}
-
-// 3. Reasignar Id_Cuota y Secuencia a las NO procesadas
-int nuevaSecuencia = 1;
-for (int i = 0; i < lineasDetalle.size(); i++) {
-    String[] partes = lineasDetalle.get(i).split(",");
-    if (partes.length >= 6 && partes[5].equalsIgnoreCase("false")) {
-        partes[0] = String.valueOf(nuevoIdCuota); // nuevo ID de cuota
-        partes[1] = String.format("%03d", nuevaSecuencia++); // nueva secuencia
-        nuevasLineasDetalle.add(String.join(",", partes));
-    }
-}
-
-
 
         // Guardar los archivos actualizados
         Files.write(Paths.get("archivos/cobros.txt"), nuevasLineasCobro);
@@ -250,20 +222,21 @@ for (int i = 0; i < lineasDetalle.size(); i++) {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PACuota.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PACuotacopia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PACuota.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PACuotacopia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PACuota.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PACuotacopia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PACuota.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PACuotacopia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PACuota().setVisible(true);
+                new PACuotacopia().setVisible(true);
             }
         });
     }

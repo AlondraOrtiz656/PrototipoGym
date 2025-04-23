@@ -11,6 +11,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +47,12 @@ public class MCuotasRoto extends javax.swing.JFrame {
     String idCuota = txtMCid.getText().trim();
     String idCliente = txtMC_IDcliente.getText().trim();
     if (idCuota.isEmpty() || idCliente.isEmpty()) return;
-
+    
+    if (estaCuotaProcesada(idCuota)) {
+        JOptionPane.showMessageDialog(null, "Esta cuota ya fue procesada y no se puede modificar.");
+        return;
+    }
+    
     if (existeEncabezado(idCuota, idCliente)) {
         txtMUAccion.setText("Modificando");
         cargarEncabezado(idCuota);
@@ -58,6 +65,22 @@ public class MCuotasRoto extends javax.swing.JFrame {
 
         generarDetalleEnMemoria(idCuota, idCliente); // Muestra los datos en la tabla
     }
+}
+private boolean estaCuotaProcesada(String idCuota) {
+    try {
+        List<String> lineasDetalle = Files.readAllLines(Paths.get("archivos/detalle_cuota.txt"));
+        for (String linea : lineasDetalle) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 6 && partes[0].equals(idCuota)) {
+                if (partes[5].equalsIgnoreCase("Procesado")) {
+                    return true;
+                }
+            }
+        }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(null, "Error al verificar cuota: " + e.getMessage());
+    }
+    return false;
 }
 
 
@@ -93,22 +116,30 @@ public class MCuotasRoto extends javax.swing.JFrame {
         }
     }
 
-    private void cargarDetalleCuota(String idCuota) {
-        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-        modelo.setRowCount(0);
-        try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length >= 6 && datos[0].equals(idCuota)) {
-                    boolean status = Boolean.parseBoolean(datos[5]);
-                    modelo.addRow(new Object[]{datos[0], datos[1], datos[2], datos[3], datos[4], status});
-                }
+private void cargarDetalleCuota(String idCuota) {
+    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+    modelo.setRowCount(0);
+    try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 6 && datos[0].equals(idCuota) && !datos[5].equalsIgnoreCase("Procesado")) {
+                boolean status = Boolean.parseBoolean(datos[5]);
+                modelo.addRow(new Object[]{
+                    datos[0], // idCuota
+                    datos[1], // sec
+                    datos[2], // concepto
+                    datos[3], // valor
+                    datos[4], // idCobro
+                    status    // status booleano
+                });
             }
-        } catch (IOException e) {
-            mostrarError("cargar detalle cuota", e);
         }
+    } catch (IOException e) {
+        mostrarError("cargar detalle cuota", e);
     }
+}
+
 
     private void generarDetalleEnMemoria(String idCuota, String idCliente) {
         DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
@@ -179,7 +210,7 @@ public class MCuotasRoto extends javax.swing.JFrame {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] d = linea.split(",");
-                if (d.length >= 5
+                if (d.length >= 6
                     && d[2].equals(idCliente)
                     && d[4].equalsIgnoreCase(concepto)) {
                     return d[0];

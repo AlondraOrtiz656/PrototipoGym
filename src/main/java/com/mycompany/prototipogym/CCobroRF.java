@@ -45,7 +45,7 @@ public class CCobroRF extends javax.swing.JFrame {
                     datos[2].trim(), // Id cliente
                     datos[3].trim(), // valor
                     datos[4].trim(), // concepto
-                    datos[5].trim(), // status
+                    datos[5].trim().equals("false") ? "Pendiente" : "Pagado", // status
                 };
                 modelo.addRow(fila);
                 listaUsuarios.add(fila);

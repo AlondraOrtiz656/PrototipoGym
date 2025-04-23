@@ -9,5 +9,11 @@
 009,01 mar 2025,2222,1000.00,Cobro Marzo 2025,false
 010,01 abr 2025,2222,1000.00,Cobro Abril 2025,false
 011,04 abr 2025,1111,2500.00,Cobro Abril 2025,false
-012,21 mar 2025,2,1500.0,Cobro Marzo 2025,false
+012,21 mar 2025,2,1500.0,Cobro Marzo 2025,true
 013,21 abr 2025,2,1500.0,Cobro Abril 2025,false
+014,16 may 2025,1234,1500.0,Cobro Mayo 2025,false
+015,04 may 2025,2121,1000.0,Cobro Mayo 2025,false
+016,01 may 2025,2222,1000.00,Cobro Mayo 2025,false
+017,04 may 2025,1111,2500.00,Cobro Mayo 2025,false
+018,19 may 2025,1010,1500.00,Cobro Mayo 2025,false
+019,21 may 2025,2,1500.0,Cobro Mayo 2025,false

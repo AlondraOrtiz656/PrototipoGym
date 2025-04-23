@@ -5,7 +5,6 @@
 package com.mycompany.prototipogym;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,11 +15,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -34,6 +32,8 @@ public class MCuotas extends javax.swing.JFrame {
         initComponents();
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
+        txtMUAccion.setText("Creando");
+        
     }
 
     private static final String ENCABEZADO_PATH = "archivos/encabezado_cuota.txt";
@@ -41,208 +41,172 @@ public class MCuotas extends javax.swing.JFrame {
     private static final String CLIENTE_PATH = "archivos/cliente.txt";
     private static final String COBROS_PATH = "archivos/cobros.txt";
 
-private void verificarOCargarCuota() {
+    private void verificarOCargarCuota() {
     String idCuota = txtMCid.getText().trim();
-    File archivo = new File(ENCABEZADO_PATH);
-    boolean encontrado = false;
-
-    try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            String[] datos = linea.split(",");
-            if (datos.length >= 5 && datos[0].equals(idCuota)) {
-                SimpleDateFormat formato = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "ES"));
-                fechaChooser.setDate(formato.parse(datos[1]));
-                txtMC_IDcliente.setText(datos[2]);
-                txtMCvalorcobro.setText(datos[3]);
-                txtMUAccion.setText("Modificando");
-                
-                cargarNombreCliente(datos[2]);
-                generarDetalleCuotas(idCuota, datos[2]); // Primero generas
-                cargarDetalleCuota(idCuota, datos[2]);   // Luego cargas lo generado
-                
-                encontrado = true;
-                break;
-            }
-        }
-    } catch (Exception e) {
-        mostrarError("verificar cuota", e);
-    }
-
-    if (!encontrado) {
+    String idCliente = txtMC_IDcliente.getText().trim();
+    if (idCuota.isEmpty() || idCliente.isEmpty()) return;
+    if (existeEncabezado(idCuota, idCliente)) {
+        txtMUAccion.setText("Modificando");
+        cargarEncabezado(idCuota);
+        cargarDetalleCuota(idCuota);
+    } else {
         txtMUAccion.setText("Creando");
         fechaChooser.setDate(new Date());
-        txtMCvalorcobro.setText("");
-        txtnombrecliente.setText("");
-        txtMC_IDcliente.setText("");
-        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-        modelo.setRowCount(0);
+
+        cargarNombreCliente(idCliente); // Esto carga también el valor de cuota
+
+        generarDetalleEnMemoria(idCuota, idCliente); // Muestra los datos en la tabla
     }
-    
 }
 
 
-    private void cargarDetalleCuota(String idCuota, String idCliente) {
-        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-        modelo.setRowCount(0);
-        File detalleArchivo = new File(DETALLE_PATH);
-        File cobrosArchivo = new File(COBROS_PATH);
-
-        try (BufferedReader br = new BufferedReader(new FileReader(detalleArchivo))) {
+    private boolean existeEncabezado(String idCuota, String idCliente) {
+        try (BufferedReader br = new BufferedReader(new FileReader(ENCABEZADO_PATH))) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 5 && datos[0].equals(idCuota)) {
-                String concepto = datos[2]; // <--- Agregado
-                String idCobro = buscarIdCobroCorrespondiente(idCliente, concepto, new File(COBROS_PATH));
-                modelo.addRow(new Object[]{datos[0], datos[1], datos[2], datos[3], idCobro});
-            }
-
-            }
-        } catch (IOException e) {
-            mostrarError("cargar detalle cuota", e);
-        }
-    }
-
-private String buscarIdCobroCorrespondiente(String idCliente, String concepto, File archivoCobros) {
-    try (BufferedReader br = new BufferedReader(new FileReader(archivoCobros))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            String[] datos = linea.split(",");
-            if (datos.length >= 5 && datos[2].equals(idCliente) && datos[4].equalsIgnoreCase(concepto)) {
-                return datos[0]; // ID del cobro
-            }
-        }
-    } catch (IOException e) {
-        mostrarError("buscar ID cobro", e);
-    }
-    return "No encontrado";
-}
-
-
-    private void cargarNombreCliente(String idCliente) {
-        try (BufferedReader br = new BufferedReader(new FileReader(CLIENTE_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length > 13 && datos[0].equals(idCliente)) {
-                    txtnombrecliente.setText(datos[1]);
-                    txtMCvalorcobro.setText(datos[13]);
-                    return;
+                if (datos.length >= 5 && datos[0].equals(idCuota) && datos[2].equals(idCliente)) {
+                    return true;
                 }
             }
-        } catch (IOException e) {
-            mostrarError("cargar cliente", e);
-        }
-        txtnombrecliente.setText("Cliente no encontrado");
-        txtMCvalorcobro.setText("");
+        } catch (IOException ignored) {}
+        return false;
     }
 
-private void generarDetalleCuotas(String idCuota, String idCliente) {
-    String valorCuota = "", nombreCliente = "", fechaIngresoStr = "";
-    List<String> conceptosExistentes = new ArrayList<>();
-
-    // Obtener datos del cliente
-    try (BufferedReader br = new BufferedReader(new FileReader(CLIENTE_PATH))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            String[] datos = linea.split(",");
-            if (datos[0].equals(idCliente)) {
-                valorCuota = datos[13];         // Valor de la cuota
-                nombreCliente = datos[1];       // Nombre del cliente
-                fechaIngresoStr = datos[8];     // Fecha de ingreso (posición 8)
-                break;
+    private void cargarEncabezado(String idCuota) {
+        try (BufferedReader br = new BufferedReader(new FileReader(ENCABEZADO_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos[0].equals(idCuota)) {
+                    SimpleDateFormat formato = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "ES"));
+                    fechaChooser.setDate(formato.parse(datos[1]));
+                    txtMC_IDcliente.setText(datos[2]);
+                    txtMCvalorcobro.setText(datos[3]);
+                    cargarNombreCliente(datos[2]);
+                    break;
+                }
             }
+        } catch (Exception e) {
+            mostrarError("cargar encabezado", e);
         }
-    } catch (IOException e) {
-        mostrarError("leyendo cliente.txt", e);
-        return;
     }
 
-    if (valorCuota.isEmpty() || fechaIngresoStr.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Cliente no encontrado o sin fecha de ingreso/valor de cuota.");
-        return;
-    }
-
-    // Cargar conceptos existentes
+private void cargarDetalleCuota(String idCuota) {
+    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+    modelo.setRowCount(0);
     try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] datos = linea.split(",");
-            if (datos.length >= 5 && datos[0].equals(idCuota)) {
-                conceptosExistentes.add(datos[2]);
+            if (datos.length >= 6 && datos[0].equals(idCuota) && !datos[5].equalsIgnoreCase("Procesado")) {
+                boolean status = Boolean.parseBoolean(datos[5]);
+                modelo.addRow(new Object[]{
+                    datos[0], // idCuota
+                    datos[1], // sec
+                    datos[2], // concepto
+                    datos[3], // valor
+                    datos[4], // idCobro
+                    status    // status booleano
+                });
             }
         }
-    } catch (IOException ignored) {}
-
-    // Convertir fecha de ingreso a Calendar
-    SimpleDateFormat sdfInput = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "ES"));
-    SimpleDateFormat sdfConcepto = new SimpleDateFormat("MMMM yyyy", new Locale("es", "ES"));
-    Calendar fechaIngreso = Calendar.getInstance();
-    Calendar fechaActual = Calendar.getInstance();
-
-    try {
-        Date fecha = sdfInput.parse(fechaIngresoStr);
-        fechaIngreso.setTime(fecha);
-    } catch (ParseException e) {
-        mostrarError("convertir fecha de ingreso", e);
-        return;
+    } catch (IOException e) {
+        mostrarError("cargar detalle cuota", e);
     }
-
-    // La primera cuota es el mes siguiente al de ingreso
-    fechaIngreso.add(Calendar.MONTH, 1);
-
-    // Generar conceptos desde el mes siguiente hasta el mes actual
-    List<String> conceptosNuevos = new ArrayList<>();
-    Calendar iterador = (Calendar) fechaIngreso.clone();
-
-    while (!iterador.after(fechaActual)) {
-    String mesConFormato = sdfConcepto.format(iterador.getTime());
-    mesConFormato = mesConFormato.substring(0, 1).toUpperCase() + mesConFormato.substring(1);
-    String concepto = "Cobro " + mesConFormato;
-    if (!conceptosExistentes.contains(concepto)) {
-        conceptosNuevos.add(concepto);
-    }
-    iterador.add(Calendar.MONTH, 1);
-}
-
-    if (conceptosNuevos.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "No hay cuotas pendientes por generar.");
-        cargarDetalleCuota(idCuota, idCliente);
-        return;
-    }
-
-    int ultimoSec = obtenerUltimoSecCuota(idCuota);
-    
-
-    try (PrintWriter pw = new PrintWriter(new FileWriter(DETALLE_PATH, true))) {
-    for (String concepto : conceptosNuevos) {
-        ultimoSec++;
-        String sec = String.format("%03d", ultimoSec);
-        String idCobro = buscarIdCobroCorrespondiente(idCliente, concepto, new File(COBROS_PATH)); // <- dentro del bucle
-        pw.println(idCuota + "," + sec + "," + concepto + "," + valorCuota + "," + idCobro);
-    }
-    JOptionPane.showMessageDialog(this, "Cuotas generadas correctamente.");
-} catch (IOException e) {
-    mostrarError("guardar detalle cuota", e);
-}
-   
 }
 
 
+    private void generarDetalleEnMemoria(String idCuota, String idCliente) {
+        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+        modelo.setRowCount(0);
+        List<String> conceptos = calcularConceptosFaltantes(idCliente, idCuota);
+        int sec = obtenerUltimoSecCuota(idCuota);
+        String valor = txtMCvalorcobro.getText().trim();
+        for (String conc : conceptos) {
+            sec++;
+            modelo.addRow(new Object[]{idCuota,
+                                      String.format("%03d", sec),
+                                      conc,
+                                      valor,
+                                      buscarIdCobroCorrespondiente(idCliente, conc),
+                                      Boolean.FALSE});
+        }
+    }
 
+    private List<String> calcularConceptosFaltantes(String idCliente, String idCuota) {
+        String fechaIngresoStr = null;
+        List<String> existentes = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(CLIENTE_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] d = linea.split(",");
+                if (d[0].equals(idCliente)) {
+                    fechaIngresoStr = d[8];
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            mostrarError("leer cliente", e);
+            return Collections.emptyList();
+        }
+        if (fechaIngresoStr == null) return Collections.emptyList();
 
+        try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] d = linea.split(",");
+                if (d[0].equals(idCuota)) existentes.add(d[2]);
+            }
+        } catch (IOException ignored) {}
+
+        SimpleDateFormat sdfIn = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES"));
+        SimpleDateFormat sdfConc = new SimpleDateFormat("MMMM yyyy", new Locale("es","ES"));
+        Calendar ini = Calendar.getInstance();
+        try {
+            ini.setTime(sdfIn.parse(fechaIngresoStr));
+        } catch (ParseException e) {
+            return Collections.emptyList();
+        }
+        ini.add(Calendar.MONTH, 1);
+        Calendar hoy = Calendar.getInstance();
+        List<String> nuevos = new ArrayList<>();
+        while (!ini.after(hoy)) {
+            String m = sdfConc.format(ini.getTime());
+            m = m.substring(0,1).toUpperCase() + m.substring(1);
+            String c = "Cobro " + m;
+            if (!existentes.contains(c)) nuevos.add(c);
+            ini.add(Calendar.MONTH, 1);
+        }
+        return nuevos;
+    }
+
+    private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
+        try (BufferedReader br = new BufferedReader(new FileReader(COBROS_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] d = linea.split(",");
+                if (d.length >= 6
+                    && d[2].equals(idCliente)
+                    && d[4].equalsIgnoreCase(concepto)) {
+                    return d[0];
+                }
+            }
+        } catch (IOException e) {
+            mostrarError("buscar ID cobro", e);
+        }
+        return "";
+    }
 
     private int obtenerUltimoSecCuota(String idCuota) {
         int ultimo = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
             String linea;
             while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length >= 2 && datos[0].equals(idCuota)) {
+                String[] d = linea.split(",");
+                if (d[0].equals(idCuota)) {
                     try {
-                        int sec = Integer.parseInt(datos[1]);
-                        if (sec > ultimo) ultimo = sec;
+                        ultimo = Math.max(ultimo, Integer.parseInt(d[1]));
                     } catch (NumberFormatException ignored) {}
                 }
             }
@@ -253,42 +217,99 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
     private void guardarCuota() {
         String idCuota = txtMCid.getText().trim();
         String idCliente = txtMC_IDcliente.getText().trim();
-        String valorCobro = txtMCvalorcobro.getText().trim();
-        String fecha = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "ES")).format(fechaChooser.getDate());
-        String nuevaLinea = idCuota + "," + fecha + "," + idCliente + "," + valorCobro + ",false";
+        String valor = txtMCvalorcobro.getText().trim();
+        String fecha = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES")).format(fechaChooser.getDate());
+        actualizarEncabezadoArchivo(idCuota, fecha, idCliente, valor);
+        actualizarDetalleArchivo(idCuota);
+        limpiarCampos();
+        JOptionPane.showMessageDialog(null, "Cuota guardada exitosamente.");
 
-        List<String> lineas = new ArrayList<>();
-        boolean encontrado = false;
+    }
 
-        File archivo = new File(ENCABEZADO_PATH);
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos[0].equals(idCuota)) {
-                    lineas.add(nuevaLinea);
-                    encontrado = true;
+    private void actualizarEncabezadoArchivo(String idCuota,
+                                            String fecha,
+                                            String idCliente,
+                                            String valor) {
+        String lineaNueva = String.join(",",
+                                        idCuota,
+                                        fecha,
+                                        idCliente,
+                                        valor,
+                                        "false");
+        List<String> todos = new ArrayList<>();
+        boolean found = false;
+        try (BufferedReader br = new BufferedReader(new FileReader(ENCABEZADO_PATH))) {
+            String l;
+            while ((l = br.readLine()) != null) {
+                if (l.startsWith(idCuota + ",")) {
+                    todos.add(lineaNueva);
+                    found = true;
                 } else {
-                    lineas.add(linea);
+                    todos.add(l);
                 }
             }
-        } catch (FileNotFoundException ignored) {
+        } catch (IOException ignored) {}
+        if (!found) todos.add(lineaNueva);
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ENCABEZADO_PATH))) {
+            for (String s : todos) pw.println(s);
         } catch (IOException e) {
-            mostrarError("leer archivo", e);
-            return;
-        }
-
-        if (!encontrado) {
-            lineas.add(nuevaLinea);
-        }
-
-        try (PrintWriter pw = new PrintWriter(new FileWriter(archivo))) {
-            for (String l : lineas) pw.println(l);
-            JOptionPane.showMessageDialog(this, "Cuota guardada correctamente.");
-        } catch (IOException e) {
-            mostrarError("guardar cuota", e);
+            mostrarError("actualizar encabezado", e);
         }
     }
+
+    private void actualizarDetalleArchivo(String idCuota) {
+        List<String> otros = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+            String l;
+            while ((l = br.readLine()) != null) {
+                if (!l.startsWith(idCuota + ",")) {
+                    otros.add(l);
+                }
+            }
+        } catch (IOException ignored) {}
+
+        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            Object id    = modelo.getValueAt(i, 0);
+            Object sec   = modelo.getValueAt(i, 1);
+            Object conc  = modelo.getValueAt(i, 2);
+            Object val   = modelo.getValueAt(i, 3);
+            Object cob   = modelo.getValueAt(i, 4);
+            Object st    = modelo.getValueAt(i, 5);
+            otros.add(String.join(",",
+                        id.toString(),
+                        sec.toString(),
+                        conc.toString(),
+                        val.toString(),
+                        cob.toString(),
+                        st.toString()));
+        }
+        try (PrintWriter pw = new PrintWriter(new FileWriter(DETALLE_PATH))) {
+            for (String s : otros) pw.println(s);
+        } catch (IOException e) {
+            mostrarError("actualizar detalle", e);
+        }
+    }
+
+    private void cargarNombreCliente(String idCliente) {
+        try (BufferedReader br = new BufferedReader(new FileReader(CLIENTE_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] d = linea.split(",");
+                if (d[0].equals(idCliente) && d.length > 13) {
+                    txtnombrecliente.setText(d[1]);
+                    txtMCvalorcobro.setText(d[13]);
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            mostrarError("cargar cliente", e);
+        }
+        txtnombrecliente.setText("Cliente no encontrado");
+        txtMCvalorcobro.setText("");
+    }
+
+
 
     private void mostrarError(String contexto, Exception e) {
         JOptionPane.showMessageDialog(this, "Error al " + contexto + ": " + e.getMessage());
@@ -339,10 +360,6 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
         fechaChooser = new com.toedter.calendar.JDateChooser();
         jScrollPane1 = new javax.swing.JScrollPane();
         TMCdetalle = new javax.swing.JTable();
-        txtfiltrosec = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -444,19 +461,11 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
         });
         jScrollPane1.setViewportView(TMCdetalle);
 
-        jLabel3.setText("Filtrar por Secuencia:");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(216, 216, 216)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtfiltrosec, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
@@ -467,21 +476,12 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
                 .addGap(45, 45, 45)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtMCid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel8)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtMC_IDcliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel8)
                                     .addComponent(jBCancelar))
-                                .addGap(68, 68, 68)
+                                .addGap(198, 198, 198)
                                 .addComponent(jBLimpiar)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
                                 .addComponent(jBGuardar))
@@ -497,9 +497,16 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addGap(52, 52, 52))))
+                                        .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(52, 52, 52))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtMC_IDcliente, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtMCid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -522,15 +529,7 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
                     .addComponent(txtMC_IDcliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtfiltrosec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(13, 13, 13)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -548,7 +547,7 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -576,10 +575,7 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMC_IDclienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMC_IDclienteActionPerformed
-        String idCliente = txtMC_IDcliente.getText().trim();
-        if (!idCliente.isEmpty()) {
-            cargarNombreCliente(idCliente);
-        }
+        verificarOCargarCuota();
     }//GEN-LAST:event_txtMC_IDclienteActionPerformed
 
     private void txtMCvalorcobroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMCvalorcobroActionPerformed
@@ -651,6 +647,102 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -668,21 +760,17 @@ private void generarDetalleCuotas(String idCuota, String idCliente) {
     private javax.swing.JButton jBLimpiar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextField txtMC_IDcliente;
     private javax.swing.JTextField txtMCid;
     private javax.swing.JTextField txtMCvalorcobro;
     private javax.swing.JTextField txtMUAccion;
-    private javax.swing.JTextField txtfiltrosec;
     private javax.swing.JTextField txtnombrecliente;
     // End of variables declaration//GEN-END:variables
 }
