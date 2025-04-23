@@ -1,1 +1,6 @@
 1234,Sala de pilates,Sala para zumba y aerobico,2121
+1235,Sala de spinning,Espacio equipado con bicicletas estáticas y luces LED,2121
+1236,Sala de musculación,Sala con pesas libres, máquinas y banco de fuerza,2121
+1237,Sala de cardio,Área con caminadoras, elípticas y escaladoras,2121
+1238,Sala funcional,Zona para entrenamientos HIIT, TRX y circuitos,2121
+1239,Sala de estiramiento,Espacio tranquilo con colchonetas y música suave,2121

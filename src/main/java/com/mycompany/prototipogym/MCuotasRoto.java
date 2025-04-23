@@ -23,6 +23,19 @@ import java.util.List;
 import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.logging.Level;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import java.awt.Desktop;
+import java.util.Arrays;
+import java.util.logging.Logger;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -35,6 +48,7 @@ public class MCuotasRoto extends javax.swing.JFrame {
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
         txtMUAccion.setText("Creando");
+
         
     }
 
@@ -42,7 +56,9 @@ public class MCuotasRoto extends javax.swing.JFrame {
     private static final String DETALLE_PATH = "archivos/detalle_cuota.txt";
     private static final String CLIENTE_PATH = "archivos/cliente.txt";
     private static final String COBROS_PATH = "archivos/cobros.txt";
-
+    
+ 
+   
     private void verificarOCargarCuota() {
     String idCuota = txtMCid.getText().trim();
     String idCliente = txtMC_IDcliente.getText().trim();
@@ -89,7 +105,7 @@ private boolean estaCuotaProcesada(String idCuota) {
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 5 && datos[0].equals(idCuota) && datos[2].equals(idCliente)) {
+                if (datos.length >= 4 && datos[0].equals(idCuota) && datos[2].equals(idCliente)) {
                     return true;
                 }
             }
@@ -116,29 +132,31 @@ private boolean estaCuotaProcesada(String idCuota) {
         }
     }
 
-private void cargarDetalleCuota(String idCuota) {
-    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-    modelo.setRowCount(0);
-    try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
-        String linea;
-        while ((linea = br.readLine()) != null) {
-            String[] datos = linea.split(",");
-            if (datos.length >= 6 && datos[0].equals(idCuota) && !datos[5].equalsIgnoreCase("Procesado")) {
-                boolean status = Boolean.parseBoolean(datos[5]);
-                modelo.addRow(new Object[]{
-                    datos[0], // idCuota
-                    datos[1], // sec
-                    datos[2], // concepto
-                    datos[3], // valor
-                    datos[4], // idCobro
-                    status    // status booleano
-                });
+    private void cargarDetalleCuota(String idCuota) {
+        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+        modelo.setRowCount(0);
+        try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 6 && datos[0].equals(idCuota) && !datos[5].equalsIgnoreCase("Procesado")) {
+                    boolean status = Boolean.parseBoolean(datos[5]);
+                    modelo.addRow(new Object[]{
+                        datos[0], // idCuota
+                        datos[1], // sec
+                        datos[2], // concepto
+                        datos[3], // valor
+                        datos[4], // idCobro
+                        status    // status booleano
+                    });
+
+                }
             }
+
+        } catch (IOException e) {
+            mostrarError("cargar detalle cuota", e);
         }
-    } catch (IOException e) {
-        mostrarError("cargar detalle cuota", e);
     }
-}
 
 
     private void generarDetalleEnMemoria(String idCuota, String idCliente) {
@@ -245,7 +263,7 @@ private void cargarDetalleCuota(String idCuota) {
         String fecha = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES")).format(fechaChooser.getDate());
         actualizarEncabezadoArchivo(idCuota, fecha, idCliente, valor);
         actualizarDetalleArchivo(idCuota);
-        limpiarCampos();
+        
         JOptionPane.showMessageDialog(null, "Cuota guardada exitosamente.");
 
     }
@@ -258,8 +276,7 @@ private void cargarDetalleCuota(String idCuota) {
                                         idCuota,
                                         fecha,
                                         idCliente,
-                                        valor,
-                                        "false");
+                                        valor);
         List<String> todos = new ArrayList<>();
         boolean found = false;
         try (BufferedReader br = new BufferedReader(new FileReader(ENCABEZADO_PATH))) {
@@ -313,6 +330,7 @@ private void cargarDetalleCuota(String idCuota) {
         } catch (IOException e) {
             mostrarError("actualizar detalle", e);
         }
+        
     }
 
     private void cargarNombreCliente(String idCliente) {
@@ -332,6 +350,79 @@ private void cargarDetalleCuota(String idCuota) {
         txtnombrecliente.setText("Cliente no encontrado");
         txtMCvalorcobro.setText("");
     }
+
+
+public void generarFacturaPDF(String idCuota) {
+    String nombreArchivo = "Factura_" + idCuota + ".pdf";
+    try {
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(nombreArchivo));
+        document.open();
+
+        Font fontTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+        Font fontNormal = FontFactory.getFont(FontFactory.HELVETICA, 12);
+
+        document.add(new Paragraph("Factura de Cuota", fontTitulo));
+        document.add(Chunk.NEWLINE);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "ES"));
+        document.add(new Paragraph("Fecha: " + sdf.format(fechaChooser.getDate()), fontNormal));
+        document.add(new Paragraph("ID Cliente: " + txtMC_IDcliente.getText(), fontNormal));
+        document.add(new Paragraph("Nombre: " + txtnombrecliente.getText(), fontNormal));
+        document.add(Chunk.NEWLINE);
+
+        PdfPTable tabla = new PdfPTable(3);
+        tabla.setWidthPercentage(100);
+        tabla.setWidths(new int[]{1, 4, 2});
+        tabla.addCell("N°");
+        tabla.addCell("Concepto");
+        tabla.addCell("Valor");
+
+        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+        double sumaTotal = 0;
+        int contador = 0;
+
+        for (int filaModelo = 0; filaModelo < modelo.getRowCount(); filaModelo++) {
+            Object statusObj = modelo.getValueAt(filaModelo, 5);
+            boolean pagado = statusObj instanceof Boolean
+                             ? (Boolean) statusObj
+                             : Boolean.parseBoolean(statusObj.toString());
+
+            if (pagado) {
+                contador++;
+                String concepto = modelo.getValueAt(filaModelo, 2).toString();
+                double valor = Double.parseDouble(modelo.getValueAt(filaModelo, 3).toString());
+                sumaTotal += valor;
+
+                tabla.addCell(String.valueOf(contador));
+                tabla.addCell(concepto);
+                tabla.addCell(String.format("%.2f", valor));
+            }
+        }
+
+        document.add(tabla);
+        document.add(Chunk.NEWLINE);
+        document.add(new Paragraph("Valor Total: $" + String.format("%.2f", sumaTotal), fontNormal));
+
+        document.close();
+
+        // Abrir el PDF automáticamente si el entorno lo permite
+        try {
+            File pdfFile = new File(nombreArchivo);
+            if (pdfFile.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(pdfFile);
+            }
+        } catch (IOException ex) {
+            System.err.println("No se pudo abrir el PDF automáticamente: " + ex.getMessage());
+        }
+
+        JOptionPane.showMessageDialog(null,
+            "Factura generada: " + nombreArchivo + " (" + contador + " ítems)");
+    } catch (Exception e) {
+        mostrarError("generar factura PDF", e);
+    }
+}
+
 
 
 
@@ -384,6 +475,7 @@ private void cargarDetalleCuota(String idCuota) {
         fechaChooser = new com.toedter.calendar.JDateChooser();
         jScrollPane1 = new javax.swing.JScrollPane();
         TMCdetalle = new javax.swing.JTable();
+        btnfactura = new javax.swing.JButton();
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -485,6 +577,13 @@ private void cargarDetalleCuota(String idCuota) {
         });
         jScrollPane1.setViewportView(TMCdetalle);
 
+        btnfactura.setText("Generar Factura");
+        btnfactura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnfacturaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -511,7 +610,7 @@ private void cargarDetalleCuota(String idCuota) {
                                 .addComponent(jBGuardar))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(txtnombrecliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
@@ -521,7 +620,9 @@ private void cargarDetalleCuota(String idCuota) {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                        .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(29, 29, 29)
+                                        .addComponent(btnfactura, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                         .addGap(52, 52, 52))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -552,7 +653,8 @@ private void cargarDetalleCuota(String idCuota) {
                     .addComponent(jLabel8)
                     .addComponent(txtMC_IDcliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnfactura))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
@@ -613,6 +715,15 @@ private void cargarDetalleCuota(String idCuota) {
     private void txtMC_IDclienteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMC_IDclienteFocusLost
         
     }//GEN-LAST:event_txtMC_IDclienteFocusLost
+
+    private void btnfacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnfacturaActionPerformed
+     String idCuota = txtMCid.getText();
+    if (TMCdetalle.getSelectedRowCount() == 0) {
+        JOptionPane.showMessageDialog(null, "Selecciona al menos una fila para generar la factura.");
+        return;
+    }
+    generarFacturaPDF(idCuota);
+    }//GEN-LAST:event_btnfacturaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -714,6 +825,7 @@ private void cargarDetalleCuota(String idCuota) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TMCdetalle;
+    private javax.swing.JButton btnfactura;
     private com.toedter.calendar.JDateChooser fechaChooser;
     private javax.swing.JButton jBCancelar;
     private javax.swing.JButton jBGuardar;

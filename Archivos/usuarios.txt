@@ -1,3 +1,4 @@
 alondra,1234,0,Alondra ,Ortiz ,
 juan,juan,1,juan,juan,juan@gmail.com
 admin,admin,0,Alondra,Ortiz,alondraortiz656@gmail.com
+user,user,0,Alondra,Ortiz,alondraortiz656@gmail.com

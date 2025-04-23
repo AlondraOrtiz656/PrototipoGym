@@ -1,1 +1,6 @@
-1234,Baile zumba,Actividad reservada para el lunes 15 en honor a juan de  blablabla mas blalbala,2121,2121
+1234,Baile zumba,Actividad reservada para el lunes 15,2121,2121
+1235,Clase de yoga,Actividad relajante para socios el martes 16 en la mañana,2121,2121
+1236,Taller funcional,Entrenamiento de alta intensidad programado para el miércoles 17,2121,2121
+1237,Spinning nocturno,Clase especial con música en vivo para el jueves 18 a las 7 PM,2121,2121
+1238,Crossfit básico,Entrenamiento dirigido para nuevos socios el viernes 19 por la tarde,2121,2121
+1239,Cardio dance,Clase dinámica de baile para quemar calorías el sábado 20,2121,2121
