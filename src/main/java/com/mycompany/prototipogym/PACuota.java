@@ -69,8 +69,22 @@ public class PACuota extends javax.swing.JFrame {
         }
 
         // —————————————————————————————————————————
-        // 2) Actualizamos cobros.txt (igual que hoy)
-        // … tu código …
+
+        // 2) Actualizamos cobros.txt
+List<String> lineasCobros = Files.readAllLines(Paths.get(COBROS_PATH));
+List<String> nuevasLineasCobros = new ArrayList<>();
+for (String linea : lineasCobros) {
+    String[] p = linea.split(",");
+    if (p.length >= 6) {
+        if (cobrosPagados.contains(p[0])) {
+            p[5] = "true"; // Actualizamos el estado del cobro
+        }
+        nuevasLineasCobros.add(String.join(",", p));
+    } else {
+        nuevasLineasCobros.add(linea); // mantener líneas mal formadas sin cambio
+    }
+}
+Files.write(Paths.get(COBROS_PATH), nuevasLineasCobros, StandardOpenOption.TRUNCATE_EXISTING);
 
         // —————————————————————————————————————————
         // 3) Calculamos el nuevo idCuota

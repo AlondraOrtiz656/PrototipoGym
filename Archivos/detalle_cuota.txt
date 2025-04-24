@@ -1,2 +1,0 @@
-1,001,Cobro Marzo 2025,1500.0,003,Procesado
-2,001,Cobro Abril 2025,1500.0,004,false

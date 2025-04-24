@@ -159,86 +159,86 @@ private boolean estaCuotaProcesada(String idCuota) {
     }
 
 
-    private void generarDetalleEnMemoria(String idCuota, String idCliente) {
-        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-        modelo.setRowCount(0);
-        List<String> conceptos = calcularConceptosFaltantes(idCliente, idCuota);
-        int sec = obtenerUltimoSecCuota(idCuota);
-        String valor = txtMCvalorcobro.getText().trim();
-        for (String conc : conceptos) {
-            sec++;
-            modelo.addRow(new Object[]{idCuota,
-                                      String.format("%03d", sec),
-                                      conc,
-                                      valor,
-                                      buscarIdCobroCorrespondiente(idCliente, conc),
-                                      Boolean.FALSE});
-        }
+ private void generarDetalleEnMemoria(String idCuota, String idCliente) {
+    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+    modelo.setRowCount(0);
+    List<String> conceptos = calcularConceptosFaltantes(idCliente, idCuota); // <--- AQUÍ
+    int sec = obtenerUltimoSecCuota(idCuota);
+    String valor = txtMCvalorcobro.getText().trim();
+    for (String conc : conceptos) {
+        sec++;
+        modelo.addRow(new Object[]{idCuota,
+                                  String.format("%03d", sec),
+                                  conc,
+                                  valor,
+                                  buscarIdCobroCorrespondiente(idCliente, conc), // <--- AQUÍ
+                                  Boolean.FALSE});
     }
+}
+
+
+
 
     private List<String> calcularConceptosFaltantes(String idCliente, String idCuota) {
-        String fechaIngresoStr = null;
-        List<String> existentes = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(CLIENTE_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] d = linea.split(",");
-                if (d[0].equals(idCliente)) {
-                    fechaIngresoStr = d[8];
-                    break;
-                }
+    List<String> conceptosCobro = new ArrayList<>();
+    List<String> conceptosDetalle = new ArrayList<>();
+    
+    // Leer los cobros del cliente
+    try (BufferedReader br = new BufferedReader(new FileReader("archivos/cobros.txt"))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 5 && partes[2].trim().equals(idCliente.trim())) {
+                String concepto = partes[4].trim();
+                conceptosCobro.add(concepto);
             }
-        } catch (IOException e) {
-            mostrarError("leer cliente", e);
-            return Collections.emptyList();
         }
-        if (fechaIngresoStr == null) return Collections.emptyList();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] d = linea.split(",");
-                if (d[0].equals(idCuota)) existentes.add(d[2]);
-            }
-        } catch (IOException ignored) {}
-
-        SimpleDateFormat sdfIn = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES"));
-        SimpleDateFormat sdfConc = new SimpleDateFormat("MMMM yyyy", new Locale("es","ES"));
-        Calendar ini = Calendar.getInstance();
-        try {
-            ini.setTime(sdfIn.parse(fechaIngresoStr));
-        } catch (ParseException e) {
-            return Collections.emptyList();
-        }
-        ini.add(Calendar.MONTH, 1);
-        Calendar hoy = Calendar.getInstance();
-        List<String> nuevos = new ArrayList<>();
-        while (!ini.after(hoy)) {
-            String m = sdfConc.format(ini.getTime());
-            m = m.substring(0,1).toUpperCase() + m.substring(1);
-            String c = "Cobro " + m;
-            if (!existentes.contains(c)) nuevos.add(c);
-            ini.add(Calendar.MONTH, 1);
-        }
-        return nuevos;
+    } catch (IOException e) {
+        e.printStackTrace();
     }
 
-    private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
-        try (BufferedReader br = new BufferedReader(new FileReader(COBROS_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] d = linea.split(",");
-                if (d.length >= 6
-                    && d[2].equals(idCliente)
-                    && d[4].equalsIgnoreCase(concepto)) {
-                    return d[0];
-                }
+    // Leer los conceptos ya generados en detalle
+    try (BufferedReader br = new BufferedReader(new FileReader("archivos/detalle_cuota.txt"))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 3 && partes[0].trim().equals(idCuota.trim())) {
+                conceptosDetalle.add(partes[2].trim()); // Concepto_Cuota
             }
-        } catch (IOException e) {
-            mostrarError("buscar ID cobro", e);
         }
-        return "";
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+
+    // Filtrar los que faltan
+    List<String> faltantes = new ArrayList<>();
+    for (String concepto : conceptosCobro) {
+        if (!conceptosDetalle.contains(concepto)) {
+            faltantes.add(concepto);
+        }
+    }
+
+    return faltantes;
+}
+
+
+private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
+    try (BufferedReader br = new BufferedReader(new FileReader("archivos/cobros.txt"))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 5 &&
+                partes[2].trim().equals(idCliente.trim()) &&
+                partes[4].trim().equalsIgnoreCase(concepto.trim())) {
+                return partes[0].trim(); // Id_Cobro
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return "";
+}
+
 
     private int obtenerUltimoSecCuota(String idCuota) {
         int ultimo = 0;
