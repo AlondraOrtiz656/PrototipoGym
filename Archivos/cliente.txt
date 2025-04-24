@@ -1,7 +1,7 @@
-1,Diana,Castro,Morales,Zona Universitaria calle UASD #5,30 nov 1990,829-114-7788,809-665-1144,21 feb 2025,Activo,1,dianacastro90@yahoo.com,1800.0,900.0
-2,Ismanuel,Cespedes,Vasquez,Arroyo Hondo calle Jose Contreras #17,03 ene 2005,809-915-2249,809-915-2249,21 feb 2025,Activo,1,,3000.0,1500.0
-3,Ana,Martinez,Lopez,Villa Juana calle 15 esquina Central,12 feb 1999,809-445-3321,829-332-1144,15 mar 2025,Activo,1,ana.martinez99@gmail.com,1400.0,1400.0
-4,Carlos,De la Cruz,Fernandez,Ensanche Quisqueya calle 7 #8,28 ago 1987,829-911-2233,849-312-5678,10 ene 2025,Activo,1,,3000.0,1000.0
-5,Laura,Gomez,Rodriguez,Los Ríos calle Proyecto #23,04 jul 2002,809-876-4421,809-421-8755,02 feb 2025,Activo,1,laura.gomez02@hotmail.com,1000.0,500.0
-6,Juan,Reyes,Delgado,La Esperilla calle G #19,15 sep 1995,809-312-9988,849-555-6677,21 feb 2025,Activo,1,,3400.0,1700.0
-10,Rosa,Lopez,Rodriguez,Moca,05 abr 2005,7893458765,3492346787,23 feb 2025,Activo,1,for@gmail.com,2300.0,2300.0
+1,Diana,Castro,Morales,Zona Universitaria calle UASD #5,30 nov 1990,829-114-7788,809-665-1144,21 feb 2025,Activo,1,dianacastro90@yahoo.com,900.0,900.0
+2,Ismanuel,Cespedes,Vasquez,Arroyo Hondo calle Jose Contreras #17,03 ene 2005,809-915-2249,809-915-2249,21 feb 2025,Activo,1,,1500.0,1500.0
+3,Ana,Martinez,Lopez,Villa Juana calle 15 esquina Central,12 feb 1999,809-445-3321,829-332-1144,15 mar 2025,Activo,1,ana.martinez99@gmail.com,0.0,1400.0
+4,Carlos,De la Cruz,Fernandez,Ensanche Quisqueya calle 7 #8,28 ago 1987,829-911-2233,849-312-5678,10 ene 2025,Activo,1,,2000.0,1000.0
+5,Laura,Gomez,Rodriguez,Los Ríos calle Proyecto #23,04 jul 2002,809-876-4421,809-421-8755,02 feb 2025,Activo,1,laura.gomez02@hotmail.com,500.0,500.0
+6,Juan,Reyes,Delgado,La Esperilla calle G #19,15 sep 1995,809-312-9988,849-555-6677,21 feb 2025,Activo,1,,1700.0,1700.0
+10,Juana,Gonzalez,Morales,Zona Universitaria calle Madre y Maestra #75 2do nivel,30 nov 1990,829-114-7788,809-665-1144,15 feb 2025,Activo,1,dianacastro90@yahoo.com,900.0,900.0

@@ -4,6 +4,7 @@
  */
 package com.mycompany.prototipogym;
 
+import com.toedter.calendar.JCalendar;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,6 +16,9 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public class PCobro extends javax.swing.JFrame {
 
@@ -25,9 +29,40 @@ public class PCobro extends javax.swing.JFrame {
         initComponents();
         setTitle("Generar Cobros");
         setLocationRelativeTo(null);
-        fechacobroChooser.setDate(new Date());
+JCalendar jcal = fechacobroChooser.getJCalendar();
 
+// 1) ocultas el DayChooser (solo una vez)
+jcal.getDayChooser().setVisible(false);
+
+// 2) escuchas PROPERTY CHANGES de mes y año
+jcal.getMonthChooser().addPropertyChangeListener("month", evt -> actualizarFechaAlUltimoDia());
+jcal.getYearChooser(). addPropertyChangeListener("year",  evt -> actualizarFechaAlUltimoDia());
+        
     }
+
+private void actualizarFechaAlUltimoDia() {
+    JCalendar jcal = fechacobroChooser.getJCalendar();
+    
+    // 1) mes y año explícitos
+    int mes = jcal.getMonthChooser().getMonth();    // 0–11
+    int año = jcal.getYearChooser().getYear();
+
+    // 2) último día con YearMonth
+    int ultimoDia = java.time.YearMonth
+                        .of(año, mes + 1)         // YearMonth usa 1–12
+                        .lengthOfMonth();       
+    
+    // 3) construye un Calendar limpio
+    Calendar cal = Calendar.getInstance();
+    cal.clear();                     // limpia todo
+    cal.set(Calendar.YEAR,  año);
+    cal.set(Calendar.MONTH, mes);
+    cal.set(Calendar.DAY_OF_MONTH, ultimoDia);
+    
+    // 4) actualiza el chooser
+    fechacobroChooser.setDate(cal.getTime());
+}
+
 
     public static class GeneradorCobros {
 
@@ -312,20 +347,20 @@ public static void actualizarBalancesDesdeCobros() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGencobroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGencobroActionPerformed
-        Date fechaSeleccionada = fechacobroChooser.getDate();
-        if (fechaSeleccionada == null) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Seleccione una fecha de cobro.");
-            return;
-        }
-        // Convertir de Date a LocalDate
-        LocalDate fechaCobroUsuario = fechaSeleccionada.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
+    Date d = fechacobroChooser.getDate();
+    if (d == null) {
+        JOptionPane.showMessageDialog(this, "Seleccione mes/año.");
+        return;
+    }
+    LocalDate corte = d.toInstant()
+                       .atZone(ZoneId.systemDefault())
+                       .toLocalDate();
         try {
-            GeneradorCobros.generarCobros(fechaCobroUsuario);
-            javax.swing.JOptionPane.showMessageDialog(null, "Cobros generados correctamente.");
+            GeneradorCobros.generarCobros(corte);
         } catch (IOException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Error generando cobros: " + ex.getMessage());
+            Logger.getLogger(PCobro.class.getName()).log(Level.SEVERE, null, ex);
         }
+    JOptionPane.showMessageDialog(this, "Cobros generados correctamente.");
     }//GEN-LAST:event_btnGencobroActionPerformed
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed

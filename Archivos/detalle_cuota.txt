@@ -1,0 +1,2 @@
+1,001,Cobro Febrero 2025,1000.0,003,true
+2,001,Cobro Marzo 2025,1000.0,004,false

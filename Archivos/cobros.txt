@@ -4,11 +4,4 @@
 004,10 mar 2025,4,1000.0,Cobro Marzo 2025,false
 005,02 mar 2025,5,500.0,Cobro Marzo 2025,false
 006,21 mar 2025,6,1700.0,Cobro Marzo 2025,false
-007,23 mar 2025,10,2300.0,Cobro Marzo 2025,false
-008,21 abr 2025,1,900.0,Cobro Abril 2025,false
-009,21 abr 2025,2,1500.0,Cobro Abril 2025,false
-010,15 abr 2025,3,1400.0,Cobro Abril 2025,false
-011,10 abr 2025,4,1000.0,Cobro Abril 2025,false
-012,02 abr 2025,5,500.0,Cobro Abril 2025,false
-013,21 abr 2025,6,1700.0,Cobro Abril 2025,false
-014,23 abr 2025,10,2300.0,Cobro Abril 2025,false
+007,15 mar 2025,10,900.0,Cobro Marzo 2025,false

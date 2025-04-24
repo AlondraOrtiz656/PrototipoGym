@@ -34,7 +34,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import java.awt.Desktop;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.swing.ListSelectionModel;
 
 /**
@@ -59,29 +62,77 @@ public class MCuotasRoto extends javax.swing.JFrame {
     
  
    
-    private void verificarOCargarCuota() {
-    String idCuota = txtMCid.getText().trim();
+private void verificarOCargarCuota() throws IOException {
+    String idCuota   = txtMCid.getText().trim();
     String idCliente = txtMC_IDcliente.getText().trim();
     if (idCuota.isEmpty() || idCliente.isEmpty()) return;
-    
+
     if (estaCuotaProcesada(idCuota)) {
-        JOptionPane.showMessageDialog(null, "Esta cuota ya fue procesada y no se puede modificar.");
+        JOptionPane.showMessageDialog(null, "Esta cuota ya fue procesada.");
         return;
     }
-    
+
     if (existeEncabezado(idCuota, idCliente)) {
         txtMUAccion.setText("Modificando");
         cargarEncabezado(idCuota);
-        cargarDetalleCuota(idCuota);
+        refrescarDetalle(idCuota, idCliente);
     } else {
         txtMUAccion.setText("Creando");
         fechaChooser.setDate(new Date());
-
-        cargarNombreCliente(idCliente); // Esto carga también el valor de cuota
-
-        generarDetalleEnMemoria(idCuota, idCliente); // Muestra los datos en la tabla
+        cargarNombreCliente(idCliente);
+        generarDetalleEnMemoria(idCuota, idCliente);
     }
 }
+private void refrescarDetalle(String idCuota, String idCliente) throws IOException {
+    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+    modelo.setRowCount(0);
+    
+    // A) cargo las líneas de detalle que NO estén Procesadas
+    try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] d = linea.split(",");
+            if (d.length >= 6
+                && d[0].equals(idCuota)
+                && !d[5].trim().equalsIgnoreCase("Procesado")) {
+                boolean status = Boolean.parseBoolean(d[5].trim());
+                modelo.addRow(new Object[]{
+                    d[0], d[1], d[2], d[3], d[4], status
+                });
+            }
+        }
+    }
+
+    // B) añado los conceptos faltantes (siempre con status false)
+    List<String> faltantes = calcularConceptosFaltantes(idCliente, idCuota);
+    int sec = obtenerUltimoSecCuota(idCuota);
+    String valor = txtMCvalorcobro.getText().trim();
+    for (String conc : faltantes) {
+        sec++;
+        modelo.addRow(new Object[]{
+            idCuota,
+            String.format("%03d", sec),
+            conc,
+            valor,
+            buscarIdCobroCorrespondiente(idCliente, conc),
+            Boolean.FALSE
+        });
+    }
+}
+
+
+
+
+    private boolean tieneDetalle(String idCuota) {
+    try (Stream<String> lines = Files.lines(Paths.get(DETALLE_PATH))) {
+        return lines
+            .map(l -> l.split(","))
+            .anyMatch(p -> p.length>=6 && p[0].equals(idCuota));
+    } catch (IOException e) {
+        return false;
+    }
+}
+
 private boolean estaCuotaProcesada(String idCuota) {
     try {
         List<String> lineasDetalle = Files.readAllLines(Paths.get("archivos/detalle_cuota.txt"));
@@ -159,7 +210,7 @@ private boolean estaCuotaProcesada(String idCuota) {
     }
 
 
- private void generarDetalleEnMemoria(String idCuota, String idCliente) {
+ private void generarDetalleEnMemoria(String idCuota, String idCliente) throws IOException {
     DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
     modelo.setRowCount(0);
     List<String> conceptos = calcularConceptosFaltantes(idCliente, idCuota); // <--- AQUÍ
@@ -179,47 +230,57 @@ private boolean estaCuotaProcesada(String idCuota) {
 
 
 
-    private List<String> calcularConceptosFaltantes(String idCliente, String idCuota) {
+private List<String> calcularConceptosFaltantes(String idCliente, String idCuota) throws IOException {
+    // 1) recojo todos los conceptos que en DETALLE_PATH están PROCESADOS (cualquier idCuota)
+    Set<String> conceptosProcesados = new HashSet<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] p = linea.split(",");
+            if (p.length >= 6 && p[5].trim().equalsIgnoreCase("Procesado")) {
+                conceptosProcesados.add(p[2].trim());
+            }
+        }
+    }
+
+    // 2) recojo los conceptos de COBROS_PATH que estén PENDIENTES (status == false) y sean de este cliente
     List<String> conceptosCobro = new ArrayList<>();
-    List<String> conceptosDetalle = new ArrayList<>();
-    
-    // Leer los cobros del cliente
-    try (BufferedReader br = new BufferedReader(new FileReader("archivos/cobros.txt"))) {
+    try (BufferedReader br = new BufferedReader(new FileReader(COBROS_PATH))) {
         String linea;
         while ((linea = br.readLine()) != null) {
-            String[] partes = linea.split(",");
-            if (partes.length >= 5 && partes[2].trim().equals(idCliente.trim())) {
-                String concepto = partes[4].trim();
-                conceptosCobro.add(concepto);
+            String[] p = linea.split(",");
+            if (p.length >= 6
+                && p[2].trim().equals(idCliente.trim())
+                && p[5].trim().equalsIgnoreCase("false")) {
+                conceptosCobro.add(p[4].trim());
             }
         }
-    } catch (IOException e) {
-        e.printStackTrace();
     }
 
-    // Leer los conceptos ya generados en detalle
-    try (BufferedReader br = new BufferedReader(new FileReader("archivos/detalle_cuota.txt"))) {
+    // 3) recojo los conceptos que ya están en ESTA cuota
+    Set<String> conceptosEnEstaCuota = new HashSet<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
         String linea;
         while ((linea = br.readLine()) != null) {
-            String[] partes = linea.split(",");
-            if (partes.length >= 3 && partes[0].trim().equals(idCuota.trim())) {
-                conceptosDetalle.add(partes[2].trim()); // Concepto_Cuota
+            String[] p = linea.split(",");
+            if (p.length >= 3
+                && p[0].trim().equals(idCuota.trim())) {
+                conceptosEnEstaCuota.add(p[2].trim());
             }
         }
-    } catch (IOException e) {
-        e.printStackTrace();
     }
 
-    // Filtrar los que faltan
+    // 4) filtro: solo lo que está en conceptosCobro, y NO está en conceptosEnEstaCuota, y NO en procesados global
     List<String> faltantes = new ArrayList<>();
-    for (String concepto : conceptosCobro) {
-        if (!conceptosDetalle.contains(concepto)) {
-            faltantes.add(concepto);
+    for (String c : conceptosCobro) {
+        if (!conceptosEnEstaCuota.contains(c)
+            && !conceptosProcesados.contains(c)) {
+            faltantes.add(c);
         }
     }
-
     return faltantes;
 }
+
 
 
 private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
@@ -227,10 +288,11 @@ private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] partes = linea.split(",");
-            if (partes.length >= 5 &&
-                partes[2].trim().equals(idCliente.trim()) &&
-                partes[4].trim().equalsIgnoreCase(concepto.trim())) {
-                return partes[0].trim(); // Id_Cobro
+            if (partes.length >= 6
+                && partes[2].trim().equals(idCliente.trim())
+                && partes[4].trim().equalsIgnoreCase(concepto.trim())
+                && partes[5].trim().equalsIgnoreCase("false")) {
+                return partes[0].trim();  // Id_Cobro pendiente
             }
         }
     } catch (IOException e) {
@@ -238,6 +300,7 @@ private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
     }
     return "";
 }
+
 
 
     private int obtenerUltimoSecCuota(String idCuota) {
@@ -298,40 +361,60 @@ private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
         }
     }
 
-    private void actualizarDetalleArchivo(String idCuota) {
-        List<String> otros = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
-            String l;
-            while ((l = br.readLine()) != null) {
-                if (!l.startsWith(idCuota + ",")) {
-                    otros.add(l);
-                }
-            }
-        } catch (IOException ignored) {}
+private void actualizarDetalleArchivo(String idCuota) {
+    List<String> otros = new ArrayList<>();
 
-        DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            Object id    = modelo.getValueAt(i, 0);
-            Object sec   = modelo.getValueAt(i, 1);
-            Object conc  = modelo.getValueAt(i, 2);
-            Object val   = modelo.getValueAt(i, 3);
-            Object cob   = modelo.getValueAt(i, 4);
-            Object st    = modelo.getValueAt(i, 5);
-            otros.add(String.join(",",
-                        id.toString(),
-                        sec.toString(),
-                        conc.toString(),
-                        val.toString(),
-                        cob.toString(),
-                        st.toString()));
+    // 1) Leer detalle_cuota.txt y conservar:
+    //    a) Todas las líneas de otras cuotas (p[0] != idCuota)
+    //    b) Las líneas de ESTA cuota que ya estén procesadas (p[5] == "true" o "Procesado")
+    try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] p = linea.split(",");
+            boolean mismaCuota = p.length >= 1 && p[0].trim().equals(idCuota);
+            boolean procesada   = p.length >= 6 && 
+                                  (p[5].trim().equalsIgnoreCase("true") 
+                                || p[5].trim().equalsIgnoreCase("Procesado"));
+            if (!mismaCuota || procesada) {
+                // conservamos esta línea
+                otros.add(linea);
+            }
+            // si es mismaCuota && !procesada, la descartamos;
+            // luego la reemplazaremos con lo que haya en la tabla
         }
-        try (PrintWriter pw = new PrintWriter(new FileWriter(DETALLE_PATH))) {
-            for (String s : otros) pw.println(s);
-        } catch (IOException e) {
-            mostrarError("actualizar detalle", e);
-        }
-        
+    } catch (IOException ignored) {}
+
+    // 2) Añadir todas las filas que están AHORA en la tabla (pendientes y nuevas)
+    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
+    for (int i = 0; i < modelo.getRowCount(); i++) {
+        Object id    = modelo.getValueAt(i, 0);
+        Object sec   = modelo.getValueAt(i, 1);
+        Object conc  = modelo.getValueAt(i, 2);
+        Object val   = modelo.getValueAt(i, 3);
+        Object cob   = modelo.getValueAt(i, 4);
+        Object st    = modelo.getValueAt(i, 5);
+        // reconstruyo la línea
+        String nueva = String.join(",",
+                    id.toString(),
+                    sec.toString(),
+                    conc.toString(),
+                    val.toString(),
+                    cob.toString(),
+                    st.toString());
+        otros.add(nueva);
     }
+
+    // 3) Volcar todo de nuevo a detalle_cuota.txt
+    try (PrintWriter pw = new PrintWriter(new FileWriter(DETALLE_PATH))) {
+        for (String s : otros) {
+            pw.println(s);
+        }
+    } catch (IOException e) {
+        mostrarError("actualizar detalle", e);
+    }
+}
+
+
 
     private void cargarNombreCliente(String idCliente) {
         try (BufferedReader br = new BufferedReader(new FileReader(CLIENTE_PATH))) {
@@ -680,7 +763,11 @@ public void generarFacturaPDF(String idCuota) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtMCidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMCidActionPerformed
-        verificarOCargarCuota();
+        try {
+            verificarOCargarCuota();
+        } catch (IOException ex) {
+            Logger.getLogger(MCuotasRoto.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_txtMCidActionPerformed
 
     private void txtMUAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMUAccionActionPerformed
@@ -701,7 +788,11 @@ public void generarFacturaPDF(String idCuota) {
     }//GEN-LAST:event_jBGuardarActionPerformed
 
     private void txtMC_IDclienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMC_IDclienteActionPerformed
-        verificarOCargarCuota();
+        try {
+            verificarOCargarCuota();
+        } catch (IOException ex) {
+            Logger.getLogger(MCuotasRoto.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_txtMC_IDclienteActionPerformed
 
     private void txtMCvalorcobroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMCvalorcobroActionPerformed
