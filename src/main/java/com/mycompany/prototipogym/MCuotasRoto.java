@@ -6,39 +6,32 @@ package com.mycompany.prototipogym;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfWriter;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.logging.Level;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import java.awt.Desktop;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import javax.swing.ListSelectionModel;
+
 
 /**
  *
@@ -51,6 +44,7 @@ public class MCuotasRoto extends javax.swing.JFrame {
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
         txtMUAccion.setText("Creando");
+        
 
         
     }
@@ -67,7 +61,8 @@ private void verificarOCargarCuota() throws IOException {
     String idCliente = txtMC_IDcliente.getText().trim();
     if (idCuota.isEmpty() || idCliente.isEmpty()) return;
 
-    if (estaCuotaProcesada(idCuota)) {
+        if (estaCuotaProcesada(idCuota,idCliente)) {
+
         JOptionPane.showMessageDialog(null, "Esta cuota ya fue procesada.");
         return;
     }
@@ -86,15 +81,32 @@ private void verificarOCargarCuota() throws IOException {
 private void refrescarDetalle(String idCuota, String idCliente) throws IOException {
     DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
     modelo.setRowCount(0);
-    
-    // A) cargo las líneas de detalle que NO estén Procesadas
+
+    // Prepara un Set con los idCobro que en cobros.txt ya están pagados
+    Set<String> cobrosYaPagados = new HashSet<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(COBROS_PATH))) {
+        String L;
+        while ((L = br.readLine()) != null) {
+            String[] c = L.split(",");
+            if (c.length >= 6 && c[5].trim().equalsIgnoreCase("true")) {
+                cobrosYaPagados.add(c[0].trim());
+            }
+        }
+    }
+
+    // A) cargo las líneas de detalle que NO estén Procesadas y cuyo cobro NO esté pagado
     try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] d = linea.split(",");
-            if (d.length >= 6
-                && d[0].equals(idCuota)
-                && !d[5].trim().equalsIgnoreCase("Procesado")) {
+            if (d.length < 6) continue;
+
+            boolean mismaCuota   = d[0].trim().equals(idCuota);
+            boolean esProcesado  = d[5].trim().equalsIgnoreCase("Procesado");
+            boolean cobroPagado  = cobrosYaPagados.contains(d[4].trim());
+
+            // solo muestro si: es de esta cuota, no está marcado Procesado, y su cobro no está pagado
+            if (mismaCuota && !esProcesado && !cobroPagado) {
                 boolean status = Boolean.parseBoolean(d[5].trim());
                 modelo.addRow(new Object[]{
                     d[0], d[1], d[2], d[3], d[4], status
@@ -103,7 +115,7 @@ private void refrescarDetalle(String idCuota, String idCliente) throws IOExcepti
         }
     }
 
-    // B) añado los conceptos faltantes (siempre con status false)
+    // B) luego añades los faltantes como ya lo tienes...
     List<String> faltantes = calcularConceptosFaltantes(idCliente, idCuota);
     int sec = obtenerUltimoSecCuota(idCuota);
     String valor = txtMCvalorcobro.getText().trim();
@@ -123,6 +135,7 @@ private void refrescarDetalle(String idCuota, String idCliente) throws IOExcepti
 
 
 
+
     private boolean tieneDetalle(String idCuota) {
     try (Stream<String> lines = Files.lines(Paths.get(DETALLE_PATH))) {
         return lines
@@ -133,18 +146,19 @@ private void refrescarDetalle(String idCuota, String idCliente) throws IOExcepti
     }
 }
 
-private boolean estaCuotaProcesada(String idCuota) {
-    try {
-        List<String> lineasDetalle = Files.readAllLines(Paths.get("archivos/detalle_cuota.txt"));
-        for (String linea : lineasDetalle) {
-            String[] partes = linea.split(",");
-            if (partes.length >= 6 && partes[0].equals(idCuota)) {
-                if (partes[5].equalsIgnoreCase("Procesado")) {
-                    return true;
-                }
-            }
-        }
-    } catch (IOException e) {
+private boolean estaCuotaProcesada(String idCuota, String idCliente) {
+    try (BufferedReader br = new BufferedReader(new FileReader(ENCABEZADO_PATH))) {
+  String l;
+  while ((l=br.readLine())!=null) {
+    String[] h = l.split(",");
+    if (h[0].equals(idCuota) && h[2].equals(idCliente)) {
+       // 2) sólo ahora miro el detalle
+       return Files.lines(Paths.get(DETALLE_PATH))
+                   .map(r->r.split(","))
+                   .anyMatch(p->p[0].equals(idCuota) && p[5].equalsIgnoreCase("Procesado"));
+    }
+  }
+} catch(IOException e){
         JOptionPane.showMessageDialog(null, "Error al verificar cuota: " + e.getMessage());
     }
     return false;
@@ -324,10 +338,22 @@ private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
         String idCliente = txtMC_IDcliente.getText().trim();
         String valor = txtMCvalorcobro.getText().trim();
         String fecha = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES")).format(fechaChooser.getDate());
+        if (TMCdetalle.isEditing()) {
+            TMCdetalle.getCellEditor().stopCellEditing();
+        }
+        for (int i = 0; i < TMCdetalle.getRowCount(); i++) {
+    System.out.println(
+      "Fila " + i + " status = " + TMCdetalle.getModel().getValueAt(i,5)
+    );
+}
         actualizarEncabezadoArchivo(idCuota, fecha, idCliente, valor);
         actualizarDetalleArchivo(idCuota);
         
         JOptionPane.showMessageDialog(null, "Cuota guardada exitosamente.");
+        
+        
+        generarFacturaPDF(idCuota);
+        limpiarCampos();
 
     }
 
@@ -359,60 +385,59 @@ private String buscarIdCobroCorrespondiente(String idCliente, String concepto) {
         } catch (IOException e) {
             mostrarError("actualizar encabezado", e);
         }
+        
+        
+        
+        
     }
 
 private void actualizarDetalleArchivo(String idCuota) {
-    List<String> otros = new ArrayList<>();
+    // 1) Construyo un Set para eliminar duplicados y preservar orden
+    Set<String> restantes = new LinkedHashSet<>();
 
-    // 1) Leer detalle_cuota.txt y conservar:
-    //    a) Todas las líneas de otras cuotas (p[0] != idCuota)
-    //    b) Las líneas de ESTA cuota que ya estén procesadas (p[5] == "true" o "Procesado")
+    // 1.a) Conservo todas las líneas de otras cuotas, y las de ESTA cuota que ya estén Procesado
     try (BufferedReader br = new BufferedReader(new FileReader(DETALLE_PATH))) {
         String linea;
         while ((linea = br.readLine()) != null) {
             String[] p = linea.split(",");
             boolean mismaCuota = p.length >= 1 && p[0].trim().equals(idCuota);
-            boolean procesada   = p.length >= 6 && 
-                                  (p[5].trim().equalsIgnoreCase("true") 
-                                || p[5].trim().equalsIgnoreCase("Procesado"));
-            if (!mismaCuota || procesada) {
-                // conservamos esta línea
-                otros.add(linea);
+            boolean procesado  = p.length >= 6 && p[5].trim().equalsIgnoreCase("Procesado");
+            if (!mismaCuota || procesado) {
+                restantes.add(linea);
             }
-            // si es mismaCuota && !procesada, la descartamos;
-            // luego la reemplazaremos con lo que haya en la tabla
         }
     } catch (IOException ignored) {}
 
-    // 2) Añadir todas las filas que están AHORA en la tabla (pendientes y nuevas)
-    DefaultTableModel modelo = (DefaultTableModel) TMCdetalle.getModel();
-    for (int i = 0; i < modelo.getRowCount(); i++) {
-        Object id    = modelo.getValueAt(i, 0);
-        Object sec   = modelo.getValueAt(i, 1);
-        Object conc  = modelo.getValueAt(i, 2);
-        Object val   = modelo.getValueAt(i, 3);
-        Object cob   = modelo.getValueAt(i, 4);
-        Object st    = modelo.getValueAt(i, 5);
-        // reconstruyo la línea
+    // 1.b) Añado todas las filas que hoy estén en la tabla (modelo),
+    //       que ya contienen el status correcto true/false
+    DefaultTableModel m = (DefaultTableModel) TMCdetalle.getModel();
+    for (int i = 0; i < m.getRowCount(); i++) {
+        Object id   = m.getValueAt(i, 0);
+        Object sec  = m.getValueAt(i, 1);
+        Object conc = m.getValueAt(i, 2);
+        Object val  = m.getValueAt(i, 3);
+        Object cob  = m.getValueAt(i, 4);
+        Object st   = m.getValueAt(i, 5);
         String nueva = String.join(",",
-                    id.toString(),
-                    sec.toString(),
-                    conc.toString(),
-                    val.toString(),
-                    cob.toString(),
-                    st.toString());
-        otros.add(nueva);
+            id.toString(),
+            sec.toString(),
+            conc.toString(),
+            val.toString(),
+            cob.toString(),
+            st.toString());
+        restantes.add(nueva);
     }
 
-    // 3) Volcar todo de nuevo a detalle_cuota.txt
+    // 2) Vuelco el Set al archivo, sin duplicados
     try (PrintWriter pw = new PrintWriter(new FileWriter(DETALLE_PATH))) {
-        for (String s : otros) {
-            pw.println(s);
+        for (String l : restantes) {
+            pw.println(l);
         }
     } catch (IOException e) {
         mostrarError("actualizar detalle", e);
     }
 }
+
 
 
 
@@ -436,6 +461,9 @@ private void actualizarDetalleArchivo(String idCuota) {
 
 
 public void generarFacturaPDF(String idCuota) {
+    if (TMCdetalle.getSelectedRowCount() == 0) {
+            return;
+        }
     String nombreArchivo = "Factura_" + idCuota + ".pdf";
     try {
         Document document = new Document();
@@ -558,7 +586,6 @@ public void generarFacturaPDF(String idCuota) {
         fechaChooser = new com.toedter.calendar.JDateChooser();
         jScrollPane1 = new javax.swing.JScrollPane();
         TMCdetalle = new javax.swing.JTable();
-        btnfactura = new javax.swing.JButton();
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
@@ -660,13 +687,6 @@ public void generarFacturaPDF(String idCuota) {
         });
         jScrollPane1.setViewportView(TMCdetalle);
 
-        btnfactura.setText("Generar Factura");
-        btnfactura.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnfacturaActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -693,7 +713,7 @@ public void generarFacturaPDF(String idCuota) {
                                 .addComponent(jBGuardar))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(txtnombrecliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
@@ -703,9 +723,8 @@ public void generarFacturaPDF(String idCuota) {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(29, 29, 29)
-                                        .addComponent(btnfactura, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                        .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(6, 6, 6)))
                         .addGap(52, 52, 52))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -736,9 +755,8 @@ public void generarFacturaPDF(String idCuota) {
                     .addComponent(jLabel8)
                     .addComponent(txtMC_IDcliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnfactura))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                    .addComponent(txtMCvalorcobro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -806,15 +824,6 @@ public void generarFacturaPDF(String idCuota) {
     private void txtMC_IDclienteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMC_IDclienteFocusLost
         
     }//GEN-LAST:event_txtMC_IDclienteFocusLost
-
-    private void btnfacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnfacturaActionPerformed
-     String idCuota = txtMCid.getText();
-    if (TMCdetalle.getSelectedRowCount() == 0) {
-        JOptionPane.showMessageDialog(null, "Selecciona al menos una fila para generar la factura.");
-        return;
-    }
-    generarFacturaPDF(idCuota);
-    }//GEN-LAST:event_btnfacturaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -916,7 +925,6 @@ public void generarFacturaPDF(String idCuota) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TMCdetalle;
-    private javax.swing.JButton btnfactura;
     private com.toedter.calendar.JDateChooser fechaChooser;
     private javax.swing.JButton jBCancelar;
     private javax.swing.JButton jBGuardar;

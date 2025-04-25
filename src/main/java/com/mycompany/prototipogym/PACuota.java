@@ -4,7 +4,9 @@
  */
 package com.mycompany.prototipogym;
 
+import com.toedter.calendar.JCalendar;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,12 +21,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import javax.swing.JOptionPane;
 
@@ -42,14 +46,22 @@ public class PACuota extends javax.swing.JFrame {
         setTitle("Pantera Fitness");
         setLocationRelativeTo(null);
         // Establecer fecha de inicio: 1 de abril de 2025
-        Calendar inicio = Calendar.getInstance();
-        inicio.set(2025, Calendar.APRIL, 1); // Recuerda: los meses empiezan desde 0 (enero = 0)
-        fechainicioChooser.setDate(inicio.getTime());
+        fechainicioChooser.getJCalendar().getDayChooser().setVisible(false);
+        fechafinalChooser .getJCalendar().getDayChooser().setVisible(false);
 
-        // Establecer fecha final: 30 de abril de 2025
-        Calendar fin = Calendar.getInstance();
-        fin.set(2025, Calendar.APRIL, 30);
-        fechafinalChooser.setDate(fin.getTime());
+        // escuchar cambios de mes/año en inicio
+        JCalendar calI = fechainicioChooser.getJCalendar();
+        calI.getMonthChooser().addPropertyChangeListener("month", e -> actualizarFechaInicio());
+        calI.getYearChooser() .addPropertyChangeListener("year",  e -> actualizarFechaInicio());
+        // inicializa con primer día del mes actual
+        actualizarFechaInicio();
+
+        // escuchar cambios de mes/año en final
+        JCalendar calF = fechafinalChooser.getJCalendar();
+        calF.getMonthChooser().addPropertyChangeListener("month", e -> actualizarFechaFinal());
+        calF.getYearChooser() .addPropertyChangeListener("year",  e -> actualizarFechaFinal());
+        // inicializa con último día del mes actual
+        actualizarFechaFinal();
     }
     
     private static final String ENCABEZADO_PATH = "archivos/encabezado_cuota.txt";
@@ -57,23 +69,24 @@ public class PACuota extends javax.swing.JFrame {
     private static final String CLIENTE_PATH = "archivos/cliente.txt";
     private static final String COBROS_PATH = "archivos/cobros.txt";
     
-    private void procesarCobros() {
-     try {
+    
+    
+private void procesarCobros() {
+    try {
         // --- parseo rango como LocalDate
         LocalDate inicio = fechainicioChooser.getDate()
                               .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate fin    = fechafinalChooser.getDate()
                               .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        
 
+        boolean seProcesoAlMenosUnCobro = false;
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("es","ES"));
 
-        // —————————————————————————————————————————
-        // 1) Leemos detalle_cuota y construimos cobrosPagados SOLO si la fecha del cobro está en el rango
+        // — 1) Leemos detalle_cuota y construimos cobrosPagados SOLO si la fecha del cobro está en el rango
         List<String> lineasDetalle = Files.readAllLines(Paths.get(DETALLE_PATH));
         Set<String> cobrosPagados = new HashSet<>();
 
-        // Primero cargamos un mapa idCobro→fecha para poder mirar la fecha al filtrar
+        // Primero cargamos un mapa idCobro→fecha para poder filtrar por fecha
         Map<String,LocalDate> fechaCobroMap = new HashMap<>();
         for (String cob : Files.readAllLines(Paths.get(COBROS_PATH))) {
             String[] c = cob.split(",");
@@ -85,22 +98,19 @@ public class PACuota extends javax.swing.JFrame {
             }
         }
 
-        // Ahora recorremos detalle
+        // Ahora recorremos detalle_cuota
         for (String linea : lineasDetalle) {
             String[] p = linea.split(",");
             if (p.length >= 6 && p[5].equalsIgnoreCase("true")) {
                 String idCobro = p[4].trim();
                 LocalDate d = fechaCobroMap.get(idCobro);
-                if (d != null 
-                    && !d.isBefore(inicio) 
-                    && !d.isAfter(fin)) {
+                if (d != null && !d.isBefore(inicio) && !d.isAfter(fin)) {
                     cobrosPagados.add(idCobro);
                 }
             }
         }
 
-        // —————————————————————————————————————————
-        // 2) Actualizamos cobros.txt SOLO para los idCobro en cobrosPagados
+        // — 2) Actualizamos cobros.txt SOLO para los idCobro en cobrosPagados
         List<String> todas = Files.readAllLines(Paths.get(COBROS_PATH));
         List<String> salida = new ArrayList<>();
         for (String linea : todas) {
@@ -115,157 +125,228 @@ public class PACuota extends javax.swing.JFrame {
         }
         Files.write(Paths.get(COBROS_PATH), salida, StandardOpenOption.TRUNCATE_EXISTING);
 
-        // —————————————————————————————————————————
-        // 3) Calculamos el nuevo idCuota
+        // — 3) Calculamos el nuevo idCuota
         int nuevoIdCuota = 1;
         for (String linea : lineasDetalle) {
             String[] p = linea.split(",");
-            if (p.length>=6 && (p[5].equalsIgnoreCase("true")||p[5].equalsIgnoreCase("Procesado"))) {
+            if (p.length >= 6 && (p[5].equalsIgnoreCase("true") || p[5].equalsIgnoreCase("Procesado"))) {
                 try {
-                    int id = Integer.parseInt(p[0]);
+                    int id = Integer.parseInt(p[0].trim());
                     if (id >= nuevoIdCuota) nuevoIdCuota = id + 1;
                 } catch (NumberFormatException ign) {}
             }
         }
 
-// —————————————————————————————————————————
-// 4) Marcamos procesados y reasignamos no procesados
-List<String> restantes = new ArrayList<>();
+        // — 4) Marcamos procesados y reasignamos no procesados
+        Set<String> restantes = new LinkedHashSet<>();
+        String idClienteParaEncabezado = null;
+        String valorCobroParaEncabezado = null;
 
-// 4.a Conserva todos los que ya estaban true, convirtiendo a "Procesado"
-//     sólo los que están dentro del rango (cobrosPagados).
-for (String linea : lineasDetalle) {
-    String[] p = linea.split(",");
-    if (p.length < 6) continue;
-
-    if (p[5].equalsIgnoreCase("true")) {
-        // si este idCobro está en cobrosPagados (rango), lo marco Procesado
-        if (cobrosPagados.contains(p[4])) {
-            p[5] = "Procesado";
+        // 4.a Conserva todos los que ya estaban true, convirtiendo a "Procesado" los del rango
+        for (String linea : lineasDetalle) {
+            String[] p = linea.split(",");
+            if (p.length >= 6 && p[5].equalsIgnoreCase("true")) {
+                if (cobrosPagados.contains(p[4].trim())) {
+                    p[5] = "Procesado";
+                    seProcesoAlMenosUnCobro = true;
+                    if (idClienteParaEncabezado == null) {
+                        idClienteParaEncabezado = buscarIdClienteEnCobros(p[4].trim());
+                        valorCobroParaEncabezado = p[3].trim();
+                    }
+                }
+                restantes.add(String.join(",", p));
+            } else if (p.length >= 6) {
+                // conserva true fuera de rango o ya Procesado previo
+                restantes.add(linea);
+            }
         }
-        // si NO está en cobrosPagados, lo dejo como "true"
-        restantes.add(String.join(",", p));
-    }
-}
 
-// 4.b Ahora los que eran false → los reasigno al nuevoIdCuota
-int sec = 1;
-String idClienteParaEncabezado = null;
-String valorCobroParaEncabezado = null;
-for (String linea : lineasDetalle) {
-    String[] p = linea.split(",");
-    if (p.length>=6 && p[5].equalsIgnoreCase("false")) {
-        p[0] = String.valueOf(nuevoIdCuota);
-        p[1] = String.format("%03d", sec++);
-        restantes.add(String.join(",",p));
-        if (idClienteParaEncabezado==null) {
-            idClienteParaEncabezado = buscarIdClienteEnCobros(p[4]);
-            valorCobroParaEncabezado = p[3];
+        // 4.b Ahora los que eran false → los reasigno al nuevoIdCuota
+        int sec = 1;
+        for (String linea : lineasDetalle) {
+            String[] p = linea.split(",");
+            if (p.length >= 6 && p[5].equalsIgnoreCase("false")) {
+                p[0] = String.valueOf(nuevoIdCuota);
+                p[1] = String.format("%03d", sec++);
+                restantes.add(String.join(",", p));
+                if (idClienteParaEncabezado == null) {
+                    idClienteParaEncabezado = buscarIdClienteEnCobros(p[4].trim());
+                    valorCobroParaEncabezado = p[3].trim();
+                }
+            }
         }
+
+        // 4.c Añade los faltantes de cobros.txt
+        Set<String> detalleExistente = new HashSet<>();
+        for (String l : restantes) {
+            String[] p = l.split(",");
+            if (p.length >= 5) detalleExistente.add(p[4].trim());
+        }
+        for (String cLine : Files.readAllLines(Paths.get(COBROS_PATH))) {
+            String[] c = cLine.split(",");
+            if (c.length >= 6
+                && c[2].trim().equals(idClienteParaEncabezado)
+                && c[5].equalsIgnoreCase("false")
+                && !detalleExistente.contains(c[0].trim())) {
+                String nueva = String.join(",",
+                    String.valueOf(nuevoIdCuota),
+                    String.format("%03d", sec++),
+                    c[4].trim(),
+                    c[3].trim(),
+                    c[0].trim(),
+                    "false"
+                );
+                restantes.add(nueva);
+            }
+        }
+
+        // — 5) Crear encabezado solo si procesé al menos un cobro y no existe aún
+        if (seProcesoAlMenosUnCobro
+            && idClienteParaEncabezado != null
+            && !existeEncabezado(String.valueOf(nuevoIdCuota), idClienteParaEncabezado)) {
+            String fechaHoy = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES")).format(new Date());
+            String lineaEnc = String.join(",",
+                String.valueOf(nuevoIdCuota),
+                fechaHoy,
+                idClienteParaEncabezado,
+                valorCobroParaEncabezado
+            );
+            Files.write(
+                Paths.get(ENCABEZADO_PATH),
+                Collections.singletonList(lineaEnc),
+                StandardOpenOption.APPEND, StandardOpenOption.CREATE
+            );
+        }
+
+    // — 6) Guardamos el detalle actualizado
+    Files.write(Paths.get(DETALLE_PATH), restantes, StandardOpenOption.TRUNCATE_EXISTING);
+
+    // 6.b) Recalcular saldos
+    actualizarBalancesDesdeCobros();
+
+    JOptionPane.showMessageDialog(this, "Cobros procesados");
+} catch (Exception e) {
+    e.printStackTrace();
+    JOptionPane.showMessageDialog(this, "Error al procesar cobros: " + e.getMessage());
+}
+}
+
+    private void actualizarFechaInicio() {
+        Calendar c = fechainicioChooser.getJCalendar().getCalendar();
+        int mes  = c.get(Calendar.MONTH);
+        int año  = c.get(Calendar.YEAR);
+        // día 1
+        c.clear();
+        c.set(Calendar.YEAR,  año);
+        c.set(Calendar.MONTH, mes);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        fechainicioChooser.setDate(c.getTime());
+    }
+
+    private void actualizarFechaFinal() {
+        Calendar c = fechafinalChooser.getJCalendar().getCalendar();
+        int mes  = c.get(Calendar.MONTH);
+        int año  = c.get(Calendar.YEAR);
+        // último día del mes
+        int último = java.time.YearMonth.of(año, mes+1).lengthOfMonth();
+        c.clear();
+        c.set(Calendar.YEAR,  año);
+        c.set(Calendar.MONTH, mes);
+        c.set(Calendar.DAY_OF_MONTH, último);
+        fechafinalChooser.setDate(c.getTime());
+    }
+
+    // … resto de la clase …
+
+
+public static void actualizarBalancesDesdeCobros() {
+    String cobroPath   = "archivos/cobros.txt";
+    String clientePath = "archivos/cliente.txt";
+
+    // Mapa idCliente -> suma de valores pendientes
+    Map<String, Double> saldoPendiente = new HashMap<>();
+
+    // 1) Leer todos los cobros y sumar solo los que están pendientes (status == false)
+    try (BufferedReader br = new BufferedReader(new FileReader(cobroPath))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 6) {
+                String idCliente = datos[2].trim();
+                double valor;
+                try {
+                    valor = Double.parseDouble(datos[3].trim());
+                } catch (NumberFormatException ex) {
+                    // Si el valor no es numérico, lo ignoramos
+                    continue;
+                }
+                String status = datos[5].trim().toLowerCase();
+
+                // Solo sumar si status es explícitamente "false"
+                if (status.equals("false")) {
+                    saldoPendiente.put(
+                        idCliente,
+                        saldoPendiente.getOrDefault(idCliente, 0.0) + valor
+                    );
+                }
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error leyendo cobros.txt: " + e.getMessage());
+        return;
+    }
+
+    // 2) Leer cliente.txt y actualizar el campo de balance (índice 12) solo con los pendientes
+    List<String> clientesActualizados = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(clientePath))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 14) {
+                String idCliente = datos[0].trim();
+                double nuevoBalance = saldoPendiente.getOrDefault(idCliente, 0.0);
+                // Actualiza solo el campo de balance, sin alterar otros
+                datos[12] = String.valueOf(nuevoBalance);
+                clientesActualizados.add(String.join(",", datos));
+            } else {
+                // Línea mal formada: se conserva sin cambio
+                clientesActualizados.add(linea);
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error leyendo cliente.txt: " + e.getMessage());
+        return;
+    }
+
+    // 3) Escribir de vuelta cliente.txt con los balances actualizados
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(clientePath))) {
+        for (String clienteLine : clientesActualizados) {
+            bw.write(clienteLine);
+            bw.newLine();
+        }
+    } catch (IOException e) {
+        System.out.println("Error escribiendo cliente.txt: " + e.getMessage());
     }
 }
 
-// 4.c Añade los faltantes de cobros.txt 
-// Construye un set con los idCobro que ya están en 'restantes'
-Set<String> detalleExistente = new HashSet<>();
-for (String l : restantes) {
-    String[] p = l.split(",");
-    if (p.length >= 5) {
-        detalleExistente.add(p[4]); 
-    }
-}
 
-// Lee todos los cobros.txt y añade los que sean de ESTE cliente y no estén en detalleExistente
-List<String> todosCobros = Files.readAllLines(Paths.get(COBROS_PATH));
-for (String cLine : todosCobros) {
-    String[] c = cLine.split(",");
-    // c[2]=idCliente, c[0]=idCobro, c[5]=status
-    if (c.length >= 6
-        && c[2].equals(idClienteParaEncabezado)
-        && c[5].equalsIgnoreCase("false")
-        && !detalleExistente.contains(c[0])) {
-        
-        String concepto = c[4];
-        String valor    = c[3];
-        String idCobro   = c[0];
-        
-        String nueva = String.join(",",
-            String.valueOf(nuevoIdCuota),
-            String.format("%03d", sec++),
-            concepto,
-            valor,
-            idCobro,
-            "false"
-        );
-        restantes.add(nueva);
-    }
-}
 
-        // —————————————————————————————————————————
-        // 5) AHORA creamos la línea de encabezado para ese nuevoIdCuota
-if (idClienteParaEncabezado != null) {
-    // declaro sdf aquí, ya disponible en esta sección
-    SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", new Locale("es","ES"));
-    String fechaHoy = sdf.format(new Date());
-    String lineaEnc = String.join(",",
-        String.valueOf(nuevoIdCuota),
-        fechaHoy,
-        idClienteParaEncabezado,
-        valorCobroParaEncabezado
-    );
-    Files.write(
-        Paths.get(ENCABEZADO_PATH),
-        Collections.singletonList(lineaEnc),
-        StandardOpenOption.APPEND, StandardOpenOption.CREATE
-    );
-}
-
-        // calcular el nextSec basado en lo que ya hay en 'restantes'
-sec = 1;
-for (String l : restantes) {
-    String[] p = l.split(",");
-    if (p.length >= 2 && Integer.parseInt(p[1]) >= sec) {
-        sec = Integer.parseInt(p[1]) + 1;
-    }
-}
-
-// 1) cargamos todos los cobros.txt para este cliente
-List<String> cobros = Files.readAllLines(Paths.get(COBROS_PATH));
-Set<String> detalleCobrosExistentes = new HashSet<>();
-for (String l : restantes) {
-    String[] p = l.split(",");
-    if (p.length >= 5) {
-        detalleCobrosExistentes.add(p[4]); // idCobro ya en detalle
-    }
-}
-
-// 2) para cada línea de cobros.txt, si es de nuestro cliente y no está en detalle, la añadimos
-for (String cLine : cobros) {
-    String[] c = cLine.split(",");
-    if (c.length >= 6 && c[2].equals(idClienteParaEncabezado) && !detalleCobrosExistentes.contains(c[0])) {
-        String concepto = c[4];
-        String valor    = c[3];
-        // construyo nueva fila de detalle: idCuota, sec, concepto, valor, idCobro, false
-        String nueva = String.join(",",
-            String.valueOf(nuevoIdCuota),
-            String.format("%03d", sec++),
-            concepto,
-            valor,
-            c[0],
-            "false"
-        );
-        restantes.add(nueva);
-    }
-}
-        // —————————————————————————————————————————
-        // 6) Guardamos el detalle actualizado
-        Files.write(Paths.get(DETALLE_PATH), restantes, StandardOpenOption.TRUNCATE_EXISTING);
-
-        JOptionPane.showMessageDialog(this, "Cobros procesados");
-    } catch (Exception e) {
+// Método auxiliar para comprobar existencia de encabezado
+private boolean existeEncabezado(String idCuota, String idCliente) {
+    try (BufferedReader br = new BufferedReader(new FileReader(ENCABEZADO_PATH))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            String[] datos = linea.split(",");
+            if (datos.length >= 4
+                && datos[0].trim().equals(idCuota.trim())
+                && datos[2].trim().equals(idCliente.trim())) {
+                return true;
+            }
+        }
+    } catch (IOException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error al procesar cobros: " + e.getMessage());
     }
+    return false;
 }
 
 // Método auxiliar para encontrar el idCliente en cobros.txt dado un idCobro
