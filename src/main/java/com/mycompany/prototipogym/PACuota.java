@@ -35,6 +35,9 @@ import javax.swing.JOptionPane;
 /**
  *
  * @author asist-depti
+ * 
+ * Lo dejé de usar porque complicaba el sistemita. 
+ * Sirve para actiulizar que las cuotas ya pagadas no salgan.
  */
 public class PACuota extends javax.swing.JFrame {
 

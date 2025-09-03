@@ -5,12 +5,11 @@
 package com.mycompany.prototipogym;
 
 import java.awt.BorderLayout;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 /**
  *
- * @author Carlos Collado
+ * @author Alondra Ortiz
  */
 public class Menu extends javax.swing.JFrame {
 
@@ -76,7 +75,6 @@ public class Menu extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem15 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem16 = new javax.swing.JMenuItem();
@@ -201,14 +199,6 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu3.add(jMenuItem3);
-
-        jMenuItem15.setText("Actualiza Cuota");
-        jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem15ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem15);
 
         jMenuBar1.add(jMenu3);
 
@@ -345,11 +335,6 @@ public class Menu extends javax.swing.JFrame {
         MRA.setVisible(true);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
-    private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
-       PACuota PAC = new PACuota();
-       PAC.setVisible(true);
-    }//GEN-LAST:event_jMenuItem15ActionPerformed
-
     private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
         CHActividades CHA = new CHActividades();
         CHA.setVisible(true);
@@ -446,7 +431,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem26ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        MCuotasRoto MCuotas = new MCuotasRoto();
+        MCuotas MCuotas = new MCuotas();
         MCuotas.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
@@ -507,7 +492,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
-    private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem16;
     private javax.swing.JMenuItem jMenuItem17;
     private javax.swing.JMenuItem jMenuItem18;
